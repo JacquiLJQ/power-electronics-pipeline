@@ -231,52 +231,6 @@ def has_wire_connection(
                 "connected_at_expand_px": px,
                 "checks": per_expand_info,
             }
-    # DEBUG_DIR = "debug_ring"
-    # os.makedirs(DEBUG_DIR, exist_ok=True)
-    # for px in range(expand_min, expand_max + 1):
-    #     ring = extract_ring_mask(img_h, img_w, det, px)
-    #     black_in_ring = int(np.sum((ring > 0) & (binary_img == 0)))
-
-    #     # ===== DEBUG VIS =====
-    #     debug_vis = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
-
-    #     # ring区域标红
-    #     debug_vis[ring > 0] = [0, 0, 255]
-
-    #     # bbox标绿
-    #     # cv2.rectangle(
-    #     #     debug_vis,
-    #     #     (det.x1, det.y1),
-    #     #     (det.x2, det.y2),
-    #     #     (0, 255, 0),
-    #     #     1,
-    #     # )
-    #     cv2.rectangle(
-    #         debug_vis,
-    #         (det.x1, det.y1),
-    #         (det.x2 - 1, det.y2 - 1),
-    #         (0, 255, 0),
-    #         1,
-    #     )
-
-    #     # 写文字
-    #     cv2.putText(
-    #         debug_vis,
-    #         f"px={px}, black={black_in_ring}",
-    #         (det.x1, max(0, det.y1 - 5)),
-    #         cv2.FONT_HERSHEY_SIMPLEX,
-    #         0.4,
-    #         (255, 0, 0),
-    #         1,
-    #         cv2.LINE_AA,
-    #     )
-
-    #     # 保存
-    #     if neededdebug:
-    #         print(np.sum(binary_img == 0))
-    #         print(black_in_ring)
-    #         save_path = os.path.join(DEBUG_DIR, f"debug_px{px}_{det.x1}_{det.y1}.png")
-    #         cv2.imwrite(save_path, debug_vis)
 
     return False, {
         "checked": True,
@@ -514,6 +468,58 @@ def detect_cross_class_overlaps(
     return flagged_pairs
 
 
+# def run_wire_checks(
+#     neededdebug: bool,
+#     binary_img: np.ndarray,
+#     dets: List[Det],
+#     current_components: List[Dict],
+#     expand_min: int,
+#     expand_max: int,
+#     min_black_pixels: int,
+#     skip_wire_check_classes: set[int],
+# ) -> List[Dict]:
+#     disconnected_boxes = []
+
+#     for i, det in enumerate(dets):
+#         comp = current_components[i]
+
+#         if det.cls_id in skip_wire_check_classes:
+#             comp["wire_connection"] = {
+#                 "checked": False,
+#                 "connected": None,
+#                 "connected_at_expand_px": None,
+#                 "checks": [],
+#                 "skipped": True,
+#                 "skip_reason": "class_in_skip_wire_check_classes",
+#             }
+#             continue
+
+#         connected, info = has_wire_connection(
+#             neededdebug,
+#             binary_img=binary_img,
+#             det=det,
+#             expand_min=expand_min,
+#             expand_max=expand_max,
+#             min_black_pixels=min_black_pixels,
+#         )
+
+#         info["skipped"] = False
+#         comp["wire_connection"] = info
+
+#         if not connected:
+#             comp["flags"]["disconnected"] = True
+#             disconnected_boxes.append(
+#                 {
+#                     "component_id": comp["component_id"],
+#                     "idx": i,
+#                     "cls_id": det.cls_id,
+#                     "box": det.to_xyxy(),
+#                     "details": info,
+#                 }
+#             )
+
+
+#     return disconnected_boxes
 def run_wire_checks(
     neededdebug: bool,
     binary_img: np.ndarray,
@@ -523,8 +529,18 @@ def run_wire_checks(
     expand_max: int,
     min_black_pixels: int,
     skip_wire_check_classes: set[int],
-) -> List[Dict]:
-    disconnected_boxes = []
+) -> Tuple[List[Det], List[Dict], List[Dict]]:
+    """
+    Run wire checks on current components.
+
+    Returns:
+      - kept_dets: components that passed / were kept
+      - kept_components: JSON component entries that remain in components_current
+      - disconnected_boxes: removed components recorded for audit/debug
+    """
+    kept_dets: List[Det] = []
+    kept_components: List[Dict] = []
+    disconnected_boxes = 0
 
     for i, det in enumerate(dets):
         comp = current_components[i]
@@ -538,6 +554,8 @@ def run_wire_checks(
                 "skipped": True,
                 "skip_reason": "class_in_skip_wire_check_classes",
             }
+            kept_dets.append(det)
+            kept_components.append(comp)
             continue
 
         connected, info = has_wire_connection(
@@ -552,19 +570,27 @@ def run_wire_checks(
         info["skipped"] = False
         comp["wire_connection"] = info
 
-        if not connected:
-            comp["flags"]["disconnected"] = True
-            disconnected_boxes.append(
-                {
-                    "component_id": comp["component_id"],
-                    "idx": i,
-                    "cls_id": det.cls_id,
-                    "box": det.to_xyxy(),
-                    "details": info,
-                }
-            )
+        if connected:
+            kept_dets.append(det)
+            kept_components.append(comp)
+        else:
+            comp["flags"]["disconnected"] = True  # has been removed
+            comp["manual_review"]["deleted"] = True
+            comp["manual_review"]["notes"] = "Auto-removed by wire connection check"
 
-    return disconnected_boxes
+            disconnected_boxes += 1
+            # .append(
+            #     {
+            #         "component_id": comp["component_id"],
+            #         "idx": i,
+            #         "cls_id": det.cls_id,
+            #         "box": det.to_xyxy(),
+            #         "details": info,
+            #         "removed_from_current": True,
+            #     }
+            # )
+
+    return kept_dets, kept_components, disconnected_boxes
 
 
 # =========================
@@ -583,8 +609,9 @@ def build_image_json(
     disconnected_boxes: List[Dict],
 ) -> Dict:
     cross_class_overlap_flag = len(cross_class_overlap_pairs) > 0
-    disconnected_component_flag = len(disconnected_boxes) > 0
-    final_flag = cross_class_overlap_flag or disconnected_component_flag
+    # disconnected_component_flag = len(disconnected_boxes) > 0
+    final_flag = cross_class_overlap_flag  # or disconnected_component_flag
+    removed_disconnected_components_flag = disconnected_boxes > 0
 
     return {
         "image_name": image_path.name,
@@ -593,7 +620,7 @@ def build_image_json(
         "image_height": image_height,
         "flags": {
             "cross_class_overlap_flag": cross_class_overlap_flag,
-            "disconnected_component_flag": disconnected_component_flag,
+            "disconnected_component_flag": removed_disconnected_components_flag,
             "final_flag": final_flag,
         },
         "summary": {
@@ -601,10 +628,10 @@ def build_image_json(
             "merged_component_count": len(current_components),
             "merged_same_class_count": merged_same_class_count,
             "cross_class_overlap_pair_count": len(cross_class_overlap_pairs),
-            "disconnected_component_count": len(disconnected_boxes),
+            "auto_removed_disconnected_count": disconnected_boxes,
         },
         "cross_class_overlap_pairs": cross_class_overlap_pairs,
-        "disconnected_components": disconnected_boxes,
+        # "disconnected_components": disconnected_boxes,
         "components_raw": raw_components,
         "components_current": current_components,
     }
@@ -756,9 +783,9 @@ def validate_one_image(
     if "100" in str(image_path):
         print(str(image_path))
         needdebug = True
-    disconnected_boxes: List[Dict] = []
+    disconnected_boxes = 0
     if len(cross_class_overlap_pairs) == 0:
-        disconnected_boxes = run_wire_checks(
+        merged_dets, current_components, disconnected_boxes = run_wire_checks(
             needdebug,
             binary_img=binary_img,
             dets=merged_dets,
