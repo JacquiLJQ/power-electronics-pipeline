@@ -23,7 +23,7 @@ def binarize_image(img_bgr, use_otsu=True, binary_threshold=127, binary_invert=F
 
 def preprocess_input_images(cfg: dict):
     source_dir = Path(cfg["source"])
-    output_dir = Path(cfg["output_dir"]) / "preprocessed_inputs"
+    output_dir = Path(cfg["preprocessed_imgs"])
     output_dir.mkdir(parents=True, exist_ok=True)
 
     image_exts = {e.lower() for e in cfg.get("image_exts", [".jpg", ".jpeg", ".png"])}

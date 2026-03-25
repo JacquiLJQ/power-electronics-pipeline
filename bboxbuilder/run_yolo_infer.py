@@ -13,8 +13,8 @@ def run_inference(cfg: dict):
     """
     weights = cfg["weights"]
     source = str(Path(cfg["preprocessed_imgs"]))
-    output_dir = str(Path(cfg["output_dir"]))
-    imgsz = cfg.get("imgsz", 1280)
+    output_dir = str((Path(cfg["output_dir"])).resolve())
+    imgsz = cfg.get("imgsz", 640)
     # conf = cfg.get("conf", 0.25)
     # iou = cfg.get("iou", 0.7)
     device = cfg.get("device", "0")

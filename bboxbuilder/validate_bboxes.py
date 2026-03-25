@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+import os
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
@@ -66,14 +67,30 @@ def find_images(folder: Path, image_exts: List[str]) -> List[Path]:
     return sorted([p for p in folder.iterdir() if p.suffix.lower() in ext_set])
 
 
+# def read_binary_image(image_path: Path) -> np.ndarray:
+#     """
+#     Read already-binarized image as grayscale.
+#     Expected pixel values: 0 or 255.
+#     """
+#     img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+#     if img is None:
+#         raise RuntimeError(f"Failed to read image: {image_path}")
+#     return img
 def read_binary_image(image_path: Path) -> np.ndarray:
     """
     Read already-binarized image as grayscale.
-    Expected pixel values: 0 or 255.
+    Expected final shape: (H, W)
+    Expected pixel values: 0 or 255
     """
-    img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(str(image_path), cv2.IMREAD_UNCHANGED)
     if img is None:
         raise RuntimeError(f"Failed to read image: {image_path}")
+
+    if img.ndim == 3 and img.shape[2] == 3:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    elif img.ndim == 3 and img.shape[2] == 1:
+        img = np.squeeze(img, axis=2)
+
     return img
 
 
@@ -177,6 +194,7 @@ def extract_ring_mask(img_h: int, img_w: int, det: Det, expand_px: int) -> np.nd
 
 
 def has_wire_connection(
+    neededdebug: bool,
     binary_img: np.ndarray,
     det: Det,
     expand_min: int = 1,
@@ -191,6 +209,7 @@ def has_wire_connection(
     In the outer ring around bbox, if enough black pixels exist,
     treat component as having wire connection.
     """
+
     img_h, img_w = binary_img.shape[:2]
     per_expand_info = []
 
@@ -212,6 +231,52 @@ def has_wire_connection(
                 "connected_at_expand_px": px,
                 "checks": per_expand_info,
             }
+    # DEBUG_DIR = "debug_ring"
+    # os.makedirs(DEBUG_DIR, exist_ok=True)
+    # for px in range(expand_min, expand_max + 1):
+    #     ring = extract_ring_mask(img_h, img_w, det, px)
+    #     black_in_ring = int(np.sum((ring > 0) & (binary_img == 0)))
+
+    #     # ===== DEBUG VIS =====
+    #     debug_vis = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
+
+    #     # ring区域标红
+    #     debug_vis[ring > 0] = [0, 0, 255]
+
+    #     # bbox标绿
+    #     # cv2.rectangle(
+    #     #     debug_vis,
+    #     #     (det.x1, det.y1),
+    #     #     (det.x2, det.y2),
+    #     #     (0, 255, 0),
+    #     #     1,
+    #     # )
+    #     cv2.rectangle(
+    #         debug_vis,
+    #         (det.x1, det.y1),
+    #         (det.x2 - 1, det.y2 - 1),
+    #         (0, 255, 0),
+    #         1,
+    #     )
+
+    #     # 写文字
+    #     cv2.putText(
+    #         debug_vis,
+    #         f"px={px}, black={black_in_ring}",
+    #         (det.x1, max(0, det.y1 - 5)),
+    #         cv2.FONT_HERSHEY_SIMPLEX,
+    #         0.4,
+    #         (255, 0, 0),
+    #         1,
+    #         cv2.LINE_AA,
+    #     )
+
+    #     # 保存
+    #     if neededdebug:
+    #         print(np.sum(binary_img == 0))
+    #         print(black_in_ring)
+    #         save_path = os.path.join(DEBUG_DIR, f"debug_px{px}_{det.x1}_{det.y1}.png")
+    #         cv2.imwrite(save_path, debug_vis)
 
     return False, {
         "checked": True,
@@ -450,6 +515,7 @@ def detect_cross_class_overlaps(
 
 
 def run_wire_checks(
+    neededdebug: bool,
     binary_img: np.ndarray,
     dets: List[Det],
     current_components: List[Dict],
@@ -475,6 +541,7 @@ def run_wire_checks(
             continue
 
         connected, info = has_wire_connection(
+            neededdebug,
             binary_img=binary_img,
             det=det,
             expand_min=expand_min,
@@ -685,9 +752,14 @@ def validate_one_image(
     )
 
     # 4) only if no cross-class overlap, run wire checks
+    needdebug = False
+    if "100" in str(image_path):
+        print(str(image_path))
+        needdebug = True
     disconnected_boxes: List[Dict] = []
     if len(cross_class_overlap_pairs) == 0:
         disconnected_boxes = run_wire_checks(
+            needdebug,
             binary_img=binary_img,
             dets=merged_dets,
             current_components=current_components,
@@ -696,6 +768,8 @@ def validate_one_image(
             min_black_pixels=min_black_pixels,
             skip_wire_check_classes=skip_wire_check_classes,
         )
+        if needdebug == True:
+            needdebug = False
     else:
         for comp in current_components:
             comp["wire_connection"] = {
@@ -753,7 +827,7 @@ def validate_folder(cfg: dict):
     output_dir = Path(cfg["output_dir"]) / "postcheck"
 
     labels_dir = pred_root / "labels"
-    images_dir = pred_root
+    images_dir = Path(cfg["preprocessed_imgs"])
 
     json_dir = output_dir / "json"
     vis_dir = output_dir / "validation_vis"

@@ -22,10 +22,10 @@ CONFIG = {
     "diff_class_overlap_thr": 0.35,
     # expand bbox outward by 1~5 pixels and check whether wire exists
     "expand_min": 1,
-    "expand_max": 5,
+    "expand_max": 3,
     # for white background + black wire/component schematics
     # "black_thresh": 120,
-    "min_black_pixels": 3,
+    "min_black_pixels": 2,
     # classes to skip wire-connection check
     # e.g. text, labels, arrows, etc.
     "skip_wire_check_classes": [],
