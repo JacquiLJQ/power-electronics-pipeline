@@ -5,10 +5,6 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 
 
-# =========================================================
-# Config
-# =========================================================
-
 CONFIG = {
     "output_dir": r"runs/pipeline_test",
     "canvas_width": 1100,
@@ -26,26 +22,12 @@ CONFIG = {
         9: "volt_src",
         10: "xformer",
     },
-    # normal bbox style
-    "normal_box_color": (0, 255, 0),
-    "normal_text_bg": (0, 255, 0),
-    "normal_text_fg": (0, 0, 0),
-    # overlap-problem style
-    "overlap_box_color": (255, 0, 0),
-    "overlap_text_bg": (255, 0, 0),
-    "overlap_text_fg": (255, 255, 255),
-    # disconnected style if later still present
-    "disconnected_box_color": (0, 0, 255),
-    "disconnected_text_bg": (0, 0, 255),
-    "disconnected_text_fg": (255, 255, 255),
+    "box_color": (0, 255, 0),
+    "text_bg": (0, 255, 0),
+    "text_fg": (0, 0, 0),
     "line_width": 1,
     "font_size": 11,
 }
-
-
-# =========================================================
-# Helpers
-# =========================================================
 
 
 def load_json(json_path: Path):
@@ -54,7 +36,6 @@ def load_json(json_path: Path):
 
 
 def get_font(size=18):
-    # PIL default font fallback
     try:
         return ImageFont.truetype("arial.ttf", size)
     except Exception:
@@ -62,35 +43,31 @@ def get_font(size=18):
 
 
 def sort_index_entries(index_entries):
-    """
-    Priority:
-      1) final_flag=True
-      2) cross_class_overlap_flag=True
-      3) disconnected_component_flag=True
-      4) then by image_name
-    """
+    def is_modified(x):
+        return (
+            x.get("has_same_class_merge", False)
+            or x.get("has_disconnected_removal", False)
+            or x.get("has_cross_class_resolve", False)
+        )
 
     def key_fn(x):
         return (
-            0 if x.get("final_flag", False) else 1,
-            0 if x.get("cross_class_overlap_flag", False) else 1,
-            0 if x.get("disconnected_component_flag", False) else 1,
+            0 if is_modified(x) else 1,
+            0 if x.get("has_cross_class_resolve", False) else 1,
+            0 if x.get("has_disconnected_removal", False) else 1,
+            0 if x.get("has_same_class_merge", False) else 1,
             x.get("image_name", ""),
         )
 
     return sorted(index_entries, key=key_fn)
 
 
-def get_overlap_component_ids(image_json):
-    overlap_ids = set()
-    for pair in image_json.get("cross_class_overlap_pairs", []):
-        a = pair.get("component_id_a")
-        b = pair.get("component_id_b")
-        if a is not None:
-            overlap_ids.add(a)
-        if b is not None:
-            overlap_ids.add(b)
-    return overlap_ids
+def is_entry_flagged(entry):
+    return (
+        entry.get("has_same_class_merge", False)
+        or entry.get("has_disconnected_removal", False)
+        or entry.get("has_cross_class_resolve", False)
+    )
 
 
 def fit_image_size(orig_w, orig_h, target_w, target_h):
@@ -114,11 +91,9 @@ def draw_label(draw, x1, y1, text, bg_color, fg_color, font, alpha=120):
         ty2 + pad_y,
     ]
 
-    # 半透明背景
     bg_rgba = (*bg_color, alpha)
     draw.rectangle(bg, fill=bg_rgba)
 
-    # 半透明文字（关键！）
     fg_rgba = (*fg_color, 255)
     draw.text((x1, y1), text, fill=fg_rgba, font=font)
 
@@ -128,63 +103,41 @@ def render_annotated_image(image_json, gui_cfg):
     if not image_path.exists():
         raise FileNotFoundError(f"Image not found: {image_path}")
 
-    # 🔥 改成 RGBA
     base_img = Image.open(image_path).convert("RGBA")
 
-    # overlay 层（透明）
     overlay = Image.new("RGBA", base_img.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
 
     font = get_font(gui_cfg["font_size"])
-    overlap_ids = get_overlap_component_ids(image_json)
+    alpha = 120
 
-    # 🎯 透明度（你可以调这个）
-    ALPHA = 120
-
-    for comp in image_json.get("components_current", []):
-        comp_id = comp["component_id"]
+    for comp in image_json.get("components", []):
         cls_id = comp["class_id"]
         x1, y1, x2, y2 = comp["bbox_xyxy"]
 
-        # ===== 颜色选择 =====
-        if comp_id in overlap_ids:
-            base_color = gui_cfg["overlap_box_color"]
-            text_bg = gui_cfg["overlap_text_bg"]
-            text_fg = gui_cfg["overlap_text_fg"]
-        elif comp.get("flags", {}).get("disconnected", False):
-            base_color = gui_cfg["disconnected_box_color"]
-            text_bg = gui_cfg["disconnected_text_bg"]
-            text_fg = gui_cfg["disconnected_text_fg"]
-        else:
-            base_color = gui_cfg["normal_box_color"]
-            text_bg = gui_cfg["normal_text_bg"]
-            text_fg = gui_cfg["normal_text_fg"]
-
-        # ===== 半透明颜色 =====
-        rgba_color = (*base_color, ALPHA)
-
-        # ===== 画边框（半透明）=====
         draw.rectangle(
             [x1, y1, x2, y2],
-            outline=rgba_color,
+            outline=(*gui_cfg["box_color"], alpha),
             width=gui_cfg["line_width"],
         )
 
-        # ===== label（保持不透明更清晰）=====
-        label_text = str(cls_id)
+        class_name = comp.get("class_name")
+        label_text = f"{cls_id}:{class_name}" if class_name else str(cls_id)
         label_y = max(0, y1 - 22)
 
-        draw_label(draw, x1, label_y, label_text, text_bg, text_fg, font, alpha=120)
+        draw_label(
+            draw,
+            x1,
+            label_y,
+            label_text,
+            gui_cfg["text_bg"],
+            gui_cfg["text_fg"],
+            font,
+            alpha=120,
+        )
 
-    # 🔥 合成
     out = Image.alpha_composite(base_img, overlay)
-
     return out.convert("RGB")
-
-
-# =========================================================
-# Main GUI
-# =========================================================
 
 
 class ReviewGUI:
@@ -218,11 +171,9 @@ class ReviewGUI:
         outer = ttk.Frame(self.root)
         outer.pack(fill="both", expand=True)
 
-        # left: canvas area
         left_frame = ttk.Frame(outer)
         left_frame.pack(side="left", fill="both", expand=True, padx=8, pady=8)
 
-        # top control bar
         ctrl = ttk.Frame(left_frame)
         ctrl.pack(side="top", fill="x")
 
@@ -233,7 +184,7 @@ class ReviewGUI:
         self.next_btn.pack(side="left", padx=4)
 
         self.goto_flagged_btn = ttk.Button(
-            ctrl, text="Next Flagged", command=self.next_flagged_image
+            ctrl, text="Next Modified", command=self.next_flagged_image
         )
         self.goto_flagged_btn.pack(side="left", padx=4)
 
@@ -251,33 +202,38 @@ class ReviewGUI:
         )
         self.canvas.pack(side="top", fill="both", expand=True)
 
-        # right: info panel
-        right_frame = ttk.Frame(outer, width=360)
+        right_frame = ttk.Frame(outer, width=420)
         right_frame.pack(side="right", fill="y", padx=8, pady=8)
 
         ttk.Label(right_frame, text="Review Panel", font=("Arial", 14, "bold")).pack(
             anchor="w", pady=(0, 10)
         )
 
-        # current image info
-        self.info_text = tk.Text(right_frame, width=42, height=18, wrap="word")
+        self.info_text = tk.Text(right_frame, width=50, height=22, wrap="word")
         self.info_text.pack(fill="x", pady=(0, 10))
 
-        # legend
         ttk.Label(right_frame, text="Class Legend", font=("Arial", 12, "bold")).pack(
             anchor="w", pady=(8, 4)
         )
-        self.legend_text = tk.Text(right_frame, width=42, height=20, wrap="word")
+        self.legend_text = tk.Text(right_frame, width=50, height=20, wrap="word")
         self.legend_text.pack(fill="both", expand=True)
 
         self.fill_legend()
 
     def fill_legend(self):
+        self.legend_text.config(state="normal")
         self.legend_text.delete("1.0", tk.END)
-        self.legend_text.insert(tk.END, "Box colors:\n")
-        self.legend_text.insert(tk.END, "  Green  = normal component\n")
-        self.legend_text.insert(tk.END, "  Red    = cross-class overlap problem\n")
-        self.legend_text.insert(tk.END, "  Blue   = disconnected (if present)\n\n")
+
+        self.legend_text.insert(tk.END, "Box color:\n")
+        self.legend_text.insert(tk.END, "  Green = final kept component\n\n")
+
+        self.legend_text.insert(
+            tk.END,
+            "Flags shown in the right panel:\n"
+            "  has_same_class_merge\n"
+            "  has_disconnected_removal\n"
+            "  has_cross_class_resolve\n\n",
+        )
 
         self.legend_text.insert(tk.END, "Class ID mapping:\n")
         mapping = self.cfg.get("class_id_to_name", {})
@@ -306,9 +262,11 @@ class ReviewGUI:
 
     def update_top_labels(self, entry):
         total = len(self.index_entries)
+        modified = is_entry_flagged(entry)
+
         self.position_label.config(text=f"Image {self.current_idx + 1}/{total}")
         self.image_info_label.config(
-            text=f"{entry['image_name']} | final_flag={entry.get('final_flag', False)}"
+            text=f"{entry['image_name']} | modified={modified}"
         )
 
     def update_info_panel(self, entry, image_json):
@@ -317,36 +275,54 @@ class ReviewGUI:
 
         flags = image_json.get("flags", {})
         summary = image_json.get("summary", {})
+        components = image_json.get("components", [])
 
         self.info_text.insert(tk.END, f"Image: {image_json.get('image_name', '')}\n")
-        self.info_text.insert(tk.END, f"Path: {image_json.get('image_path', '')}\n\n")
+        self.info_text.insert(tk.END, f"Path: {image_json.get('image_path', '')}\n")
+        self.info_text.insert(
+            tk.END,
+            f"Size: {image_json.get('image_width', '')} x {image_json.get('image_height', '')}\n\n",
+        )
 
-        self.info_text.insert(tk.END, "Flags:\n")
+        self.info_text.insert(tk.END, "Modification Flags:\n")
         self.info_text.insert(
-            tk.END, f"  final_flag: {flags.get('final_flag', False)}\n"
+            tk.END,
+            f"  has_same_class_merge: {flags.get('has_same_class_merge', False)}\n",
         )
         self.info_text.insert(
             tk.END,
-            f"  cross_class_overlap_flag: {flags.get('cross_class_overlap_flag', False)}\n",
+            f"  has_disconnected_removal: {flags.get('has_disconnected_removal', False)}\n",
         )
         self.info_text.insert(
             tk.END,
-            f"  disconnected_component_flag: {flags.get('disconnected_component_flag', False)}\n\n",
+            f"  has_cross_class_resolve: {flags.get('has_cross_class_resolve', False)}\n\n",
         )
 
         self.info_text.insert(tk.END, "Summary:\n")
-        for k, v in summary.items():
-            self.info_text.insert(tk.END, f"  {k}: {v}\n")
+        self.info_text.insert(
+            tk.END,
+            f"  raw_component_count: {summary.get('raw_component_count', 0)}\n",
+        )
+        self.info_text.insert(
+            tk.END,
+            f"  final_component_count: {summary.get('final_component_count', 0)}\n",
+        )
+        self.info_text.insert(
+            tk.END,
+            f"  merged_same_class_count: {summary.get('merged_same_class_count', 0)}\n",
+        )
+        self.info_text.insert(
+            tk.END,
+            f"  removed_cross_class_count: {summary.get('removed_cross_class_count', 0)}\n",
+        )
+        self.info_text.insert(
+            tk.END,
+            f"  removed_disconnected_count: {summary.get('removed_disconnected_count', 0)}\n",
+        )
 
-        overlap_pairs = image_json.get("cross_class_overlap_pairs", [])
-        self.info_text.insert(tk.END, f"\nOverlap pairs: {len(overlap_pairs)}\n")
-        for i, pair in enumerate(overlap_pairs[:10]):
-            self.info_text.insert(
-                tk.END,
-                f"  {i}: {pair.get('component_id_a')} <-> {pair.get('component_id_b')} "
-                f"(cls {pair.get('cls_a')} vs {pair.get('cls_b')})\n",
-            )
-
+        self.info_text.insert(
+            tk.END, f"\nVisible final components: {len(components)}\n"
+        )
         self.info_text.config(state="disabled")
 
     def update_canvas(self, image_json):
@@ -384,11 +360,11 @@ class ReviewGUI:
 
     def next_flagged_image(self):
         for i in range(self.current_idx + 1, len(self.index_entries)):
-            if self.index_entries[i].get("final_flag", False):
+            if is_entry_flagged(self.index_entries[i]):
                 self.current_idx = i
                 self.load_current_image()
                 return
-        messagebox.showinfo("Info", "No later flagged image found.")
+        messagebox.showinfo("Info", "No later modified image found.")
 
 
 def main():

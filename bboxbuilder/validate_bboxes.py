@@ -6,7 +6,7 @@ import json
 from dataclasses import dataclass
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Set, Tuple, Optional
 
 import cv2
 import numpy as np
@@ -240,14 +240,51 @@ def has_wire_connection(
     }
 
 
+# def det_to_component_dict(
+#     det: Det,
+#     component_id: str,
+#     source: str,
+#     merged_from: Optional[List[str]] = None,
+#     wire_connection: Optional[Dict] = None,
+#     flagged_cross_class_overlap: bool = False,
+#     flagged_disconnected: bool = False,
+#     class_name: Optional[str] = None,
+# ) -> Dict:
+#     return {
+#         "component_id": component_id,
+#         "class_id": det.cls_id,
+#         "class_name": class_name,
+#         "confidence": det.conf,
+#         "bbox_xyxy": det.to_xyxy(),
+#         "bbox_xywh_abs": det.to_xywh_abs(),
+#         "source": source,
+#         "merged_from": merged_from or [],
+#         "flags": {
+#             "cross_class_overlap": flagged_cross_class_overlap,
+#             "disconnected": flagged_disconnected,
+#         },
+#         "wire_connection": (
+#             wire_connection
+#             if wire_connection is not None
+#             else {
+#                 "checked": False,
+#                 "connected": None,
+#                 "connected_at_expand_px": None,
+#                 "checks": [],
+#             }
+#         ),
+#         "manual_review": {
+#             "reviewed": False,
+#             "edited": False,
+#             "deleted": False,
+#             "notes": "",
+#         },
+#     }
 def det_to_component_dict(
     det: Det,
     component_id: str,
     source: str,
     merged_from: Optional[List[str]] = None,
-    wire_connection: Optional[Dict] = None,
-    flagged_cross_class_overlap: bool = False,
-    flagged_disconnected: bool = False,
     class_name: Optional[str] = None,
 ) -> Dict:
     return {
@@ -259,26 +296,6 @@ def det_to_component_dict(
         "bbox_xywh_abs": det.to_xywh_abs(),
         "source": source,
         "merged_from": merged_from or [],
-        "flags": {
-            "cross_class_overlap": flagged_cross_class_overlap,
-            "disconnected": flagged_disconnected,
-        },
-        "wire_connection": (
-            wire_connection
-            if wire_connection is not None
-            else {
-                "checked": False,
-                "connected": None,
-                "connected_at_expand_px": None,
-                "checks": [],
-            }
-        ),
-        "manual_review": {
-            "reviewed": False,
-            "edited": False,
-            "deleted": False,
-            "notes": "",
-        },
     }
 
 
@@ -287,6 +304,28 @@ def det_to_component_dict(
 # =========================
 
 
+# def build_raw_components(
+#     dets: List[Det],
+#     class_id_to_name: Optional[Dict[int, str]] = None,
+# ) -> List[Dict]:
+#     raw_components = []
+#     for i, det in enumerate(dets):
+#         comp_id = f"raw_{i}"
+#         raw_components.append(
+#             det_to_component_dict(
+#                 det=det,
+#                 component_id=comp_id,
+#                 source="raw_yolo",
+#                 merged_from=[],
+#                 wire_connection=None,
+#                 flagged_cross_class_overlap=False,
+#                 flagged_disconnected=False,
+#                 class_name=(
+#                     class_id_to_name.get(det.cls_id) if class_id_to_name else None
+#                 ),
+#             )
+#         )
+#     return raw_components
 def build_raw_components(
     dets: List[Det],
     class_id_to_name: Optional[Dict[int, str]] = None,
@@ -300,9 +339,6 @@ def build_raw_components(
                 component_id=comp_id,
                 source="raw_yolo",
                 merged_from=[],
-                wire_connection=None,
-                flagged_cross_class_overlap=False,
-                flagged_disconnected=False,
                 class_name=(
                     class_id_to_name.get(det.cls_id) if class_id_to_name else None
                 ),
@@ -311,21 +347,139 @@ def build_raw_components(
     return raw_components
 
 
-def merge_same_class_dets_json_first(
+# def merge_same_class_dets_json_first(
+#     dets: List[Det],
+#     raw_components: List[Dict],
+#     same_class_overlap_thr: float = 0.6,
+#     class_id_to_name: Optional[Dict[int, str]] = None,
+# ) -> Tuple[List[Det], List[Dict], int]:
+#     """
+#     Merge highly overlapping boxes of the same class.
+#     Return:
+#       - merged_dets
+#       - current_components
+#       - merged_same_class_count
+#     """
+#     if not dets:
+#         return [], [], 0
+
+#     merged_dets: List[Det] = []
+#     current_components: List[Dict] = []
+#     merged_same_class_count = 0
+
+#     class_to_indices: Dict[int, List[int]] = {}
+#     for i, d in enumerate(dets):
+#         class_to_indices.setdefault(d.cls_id, []).append(i)
+
+#     comp_counter = 0
+
+#     for cls_id, idxs in class_to_indices.items():
+#         group_dets = [dets[i] for i in idxs]
+#         group_raw_components = [raw_components[i] for i in idxs]
+
+#         n = len(group_dets)
+#         dsu = DSU(n)
+
+#         for i in range(n):
+#             for j in range(i + 1, n):
+#                 r = overlap_ratio_min_area(group_dets[i], group_dets[j])
+#                 if r >= same_class_overlap_thr:
+#                     dsu.union(i, j)
+
+#         clusters: Dict[int, List[int]] = {}
+#         for i in range(n):
+#             root = dsu.find(i)
+#             clusters.setdefault(root, []).append(i)
+
+#         for cluster_indices in clusters.values():
+#             if len(cluster_indices) == 1:
+#                 idx0 = cluster_indices[0]
+#                 det = group_dets[idx0]
+#                 raw_comp = group_raw_components[idx0]
+
+#                 comp_id = f"comp_{comp_counter}"
+#                 comp_counter += 1
+
+#                 merged_dets.append(det)
+#                 current_components.append(
+#                     det_to_component_dict(
+#                         det=det,
+#                         component_id=comp_id,
+#                         source="raw_yolo",
+#                         merged_from=[raw_comp["component_id"]],
+#                         wire_connection=None,
+#                         flagged_cross_class_overlap=False,
+#                         flagged_disconnected=False,
+#                         class_name=(
+#                             class_id_to_name.get(det.cls_id)
+#                             if class_id_to_name
+#                             else None
+#                         ),
+#                     )
+#                 )
+#             else:
+#                 merged_same_class_count += len(cluster_indices) - 1
+
+#                 cluster_dets = [group_dets[k] for k in cluster_indices]
+#                 cluster_raw_ids = [
+#                     group_raw_components[k]["component_id"] for k in cluster_indices
+#                 ]
+
+#                 x1 = min(d.x1 for d in cluster_dets)
+#                 y1 = min(d.y1 for d in cluster_dets)
+#                 x2 = max(d.x2 for d in cluster_dets)
+#                 y2 = max(d.y2 for d in cluster_dets)
+#                 conf = max(d.conf for d in cluster_dets)
+
+#                 merged_det = Det(
+#                     cls_id=cls_id,
+#                     conf=conf,
+#                     x1=x1,
+#                     y1=y1,
+#                     x2=x2,
+#                     y2=y2,
+#                 )
+
+#                 comp_id = f"comp_{comp_counter}"
+#                 comp_counter += 1
+
+#                 merged_dets.append(merged_det)
+#                 current_components.append(
+#                     det_to_component_dict(
+#                         det=merged_det,
+#                         component_id=comp_id,
+#                         source="merged_same_class",
+#                         merged_from=cluster_raw_ids,
+#                         wire_connection=None,
+#                         flagged_cross_class_overlap=False,
+#                         flagged_disconnected=False,
+#                         class_name=(
+#                             class_id_to_name.get(merged_det.cls_id)
+#                             if class_id_to_name
+#                             else None
+#                         ),
+#                     )
+#                 )
+
+
+#     return merged_dets, current_components, merged_same_class_count
+def merge_same_class_dets(
     dets: List[Det],
     raw_components: List[Dict],
     same_class_overlap_thr: float = 0.6,
     class_id_to_name: Optional[Dict[int, str]] = None,
-) -> Tuple[List[Det], List[Dict], int]:
+) -> Tuple[List[Det], List[Dict], int, bool]:
     """
     Merge highly overlapping boxes of the same class.
-    Return:
+
+    Returns:
       - merged_dets
       - current_components
       - merged_same_class_count
+      - has_same_class_merge
     """
     if not dets:
-        return [], [], 0
+        return [], [], 0, False
 
     merged_dets: List[Det] = []
     current_components: List[Dict] = []
@@ -371,9 +525,6 @@ def merge_same_class_dets_json_first(
                         component_id=comp_id,
                         source="raw_yolo",
                         merged_from=[raw_comp["component_id"]],
-                        wire_connection=None,
-                        flagged_cross_class_overlap=False,
-                        flagged_disconnected=False,
                         class_name=(
                             class_id_to_name.get(det.cls_id)
                             if class_id_to_name
@@ -414,9 +565,6 @@ def merge_same_class_dets_json_first(
                         component_id=comp_id,
                         source="merged_same_class",
                         merged_from=cluster_raw_ids,
-                        wire_connection=None,
-                        flagged_cross_class_overlap=False,
-                        flagged_disconnected=False,
                         class_name=(
                             class_id_to_name.get(merged_det.cls_id)
                             if class_id_to_name
@@ -425,7 +573,13 @@ def merge_same_class_dets_json_first(
                     )
                 )
 
-    return merged_dets, current_components, merged_same_class_count
+    has_same_class_merge = merged_same_class_count > 0
+    return (
+        merged_dets,
+        current_components,
+        merged_same_class_count,
+        has_same_class_merge,
+    )
 
 
 # =========================
@@ -433,39 +587,174 @@ def merge_same_class_dets_json_first(
 # =========================
 
 
-def detect_cross_class_overlaps(
+# def detect_cross_class_overlaps(
+#     dets: List[Det],
+#     current_components: List[Dict],
+#     diff_class_overlap_thr: float = 0.35,
+# ) -> List[Dict]:
+#     flagged_pairs = []
+#     n = len(dets)
+
+#     for i in range(n):
+#         for j in range(i + 1, n):
+#             if dets[i].cls_id == dets[j].cls_id:
+#                 continue
+
+#             r = overlap_ratio_min_area(dets[i], dets[j])
+#             if r >= diff_class_overlap_thr:
+#                 current_components[i]["flags"]["cross_class_overlap"] = True
+#                 current_components[j]["flags"]["cross_class_overlap"] = True
+
+#                 flagged_pairs.append(
+#                     {
+#                         "component_id_a": current_components[i]["component_id"],
+#                         "component_id_b": current_components[j]["component_id"],
+#                         "idx_a": i,
+#                         "idx_b": j,
+#                         "cls_a": dets[i].cls_id,
+#                         "cls_b": dets[j].cls_id,
+#                         "overlap_ratio": round(r, 4),
+#                         "box_a": dets[i].to_xyxy(),
+#                         "box_b": dets[j].to_xyxy(),
+#                     }
+#                 )
+
+
+#     return flagged_pairs
+# def detect_cross_class_overlaps(
+#     dets: List[Det],
+#     current_components: List[Dict],
+#     diff_class_overlap_thr: float = 0.35,
+# ) -> Tuple[List[Dict], List[Det], List[Dict], List[int]]:
+#     """
+#     Detect cross-class overlaps and keep the bbox with higher confidence.
+
+#     Returns:
+#         flagged_pairs: all overlapping cross-class pairs
+#         kept_dets: filtered detections after removing lower-confidence boxes
+#         kept_components: filtered components after removing lower-confidence boxes
+#         removed_indices: indices in original dets/components that were removed
+#     """
+#     # flagged_pairs = []
+#     n = len(dets)
+
+#     # indices to remove after all pairwise checks
+#     remove_idx: Set[int] = set()
+
+#     for i in range(n):
+#         for j in range(i + 1, n):
+#             if dets[i].cls_id == dets[j].cls_id:
+#                 continue
+
+#             r = overlap_ratio_min_area(dets[i], dets[j])
+#             if r < diff_class_overlap_thr:
+#                 continue
+
+#             # flag both first
+#             # current_components[i]["flags"]["cross_class_overlap"] = True
+#             # current_components[j]["flags"]["cross_class_overlap"] = True
+
+#             conf_i = dets[i].conf
+#             conf_j = dets[j].conf
+
+#             # decide which one to remove
+#             if conf_i > conf_j:
+#                 remove_j = True
+#                 removed_idx = j
+#                 kept_idx = i
+#             elif conf_j > conf_i:
+#                 remove_j = False
+#                 removed_idx = i
+#                 kept_idx = j
+#             else:
+#                 # tie-breaker: keep the earlier one
+#                 removed_idx = j
+#                 kept_idx = i
+
+#             remove_idx.add(removed_idx)
+
+#             # flagged_pairs.append(
+#             #     {
+#             #         "component_id_a": current_components[i]["component_id"],
+#             #         "component_id_b": current_components[j]["component_id"],
+#             #         "idx_a": i,
+#             #         "idx_b": j,
+#             #         "cls_a": dets[i].cls_id,
+#             #         "cls_b": dets[j].cls_id,
+#             #         "conf_a": round(conf_i, 4),
+#             #         "conf_b": round(conf_j, 4),
+#             #         "overlap_ratio": round(r, 4),
+#             #         "box_a": dets[i].to_xyxy(),
+#             #         "box_b": dets[j].to_xyxy(),
+#             #         "kept_idx": kept_idx,
+#             #         "removed_idx": removed_idx,
+#             #         "kept_component_id": current_components[kept_idx]["component_id"],
+#             #         "removed_component_id": current_components[removed_idx][
+#             #             "component_id"
+#             #         ],
+#             #     }
+#             # )
+
+#     # optional: mark removed components
+#     # for idx in remove_idx:
+#     #     current_components[idx]["flags"]["removed_by_cross_class_overlap"] = True
+
+#     kept_dets = [d for k, d in enumerate(dets) if k not in remove_idx]
+#     kept_components = [
+#         c for k, c in enumerate(current_components) if k not in remove_idx
+#     ]
+
+
+#     return kept_dets, kept_components, sorted(remove_idx)
+def resolve_cross_class_overlaps(
     dets: List[Det],
     current_components: List[Dict],
     diff_class_overlap_thr: float = 0.35,
-) -> List[Dict]:
-    flagged_pairs = []
+) -> Tuple[List[Det], List[Dict], int, bool]:
+    """
+    Resolve cross-class overlaps by keeping the higher-confidence bbox.
+
+    Returns:
+        kept_dets
+        kept_components
+        removed_count
+        has_cross_class_resolve
+    """
     n = len(dets)
+    remove_idx: Set[int] = set()
 
     for i in range(n):
+        if i in remove_idx:
+            continue
+
         for j in range(i + 1, n):
+            if j in remove_idx:
+                continue
+
             if dets[i].cls_id == dets[j].cls_id:
                 continue
 
             r = overlap_ratio_min_area(dets[i], dets[j])
-            if r >= diff_class_overlap_thr:
-                current_components[i]["flags"]["cross_class_overlap"] = True
-                current_components[j]["flags"]["cross_class_overlap"] = True
+            if r < diff_class_overlap_thr:
+                continue
 
-                flagged_pairs.append(
-                    {
-                        "component_id_a": current_components[i]["component_id"],
-                        "component_id_b": current_components[j]["component_id"],
-                        "idx_a": i,
-                        "idx_b": j,
-                        "cls_a": dets[i].cls_id,
-                        "cls_b": dets[j].cls_id,
-                        "overlap_ratio": round(r, 4),
-                        "box_a": dets[i].to_xyxy(),
-                        "box_b": dets[j].to_xyxy(),
-                    }
-                )
+            conf_i = dets[i].conf
+            conf_j = dets[j].conf
 
-    return flagged_pairs
+            if conf_i >= conf_j:
+                remove_idx.add(j)
+            else:
+                remove_idx.add(i)
+                break
+
+    kept_dets = [d for k, d in enumerate(dets) if k not in remove_idx]
+    kept_components = [
+        c for k, c in enumerate(current_components) if k not in remove_idx
+    ]
+
+    removed_count = len(remove_idx)
+    has_cross_class_resolve = removed_count > 0
+    return kept_dets, kept_components, removed_count, has_cross_class_resolve
 
 
 # def run_wire_checks(
@@ -477,8 +766,18 @@ def detect_cross_class_overlaps(
 #     expand_max: int,
 #     min_black_pixels: int,
 #     skip_wire_check_classes: set[int],
-# ) -> List[Dict]:
-#     disconnected_boxes = []
+# ) -> Tuple[List[Det], List[Dict], List[Dict]]:
+#     """
+#     Run wire checks on current components.
+
+#     Returns:
+#       - kept_dets: components that passed / were kept
+#       - kept_components: JSON component entries that remain in components_current
+#       - disconnected_boxes: removed components recorded for audit/debug
+#     """
+#     kept_dets: List[Det] = []
+#     kept_components: List[Dict] = []
+#     disconnected_boxes = 0
 
 #     for i, det in enumerate(dets):
 #         comp = current_components[i]
@@ -492,6 +791,8 @@ def detect_cross_class_overlaps(
 #                 "skipped": True,
 #                 "skip_reason": "class_in_skip_wire_check_classes",
 #             }
+#             kept_dets.append(det)
+#             kept_components.append(comp)
 #             continue
 
 #         connected, info = has_wire_connection(
@@ -506,20 +807,28 @@ def detect_cross_class_overlaps(
 #         info["skipped"] = False
 #         comp["wire_connection"] = info
 
-#         if not connected:
-#             comp["flags"]["disconnected"] = True
-#             disconnected_boxes.append(
-#                 {
-#                     "component_id": comp["component_id"],
-#                     "idx": i,
-#                     "cls_id": det.cls_id,
-#                     "box": det.to_xyxy(),
-#                     "details": info,
-#                 }
-#             )
+#         if connected:
+#             kept_dets.append(det)
+#             kept_components.append(comp)
+#         else:
+#             comp["flags"]["disconnected"] = True  # has been removed
+#             comp["manual_review"]["deleted"] = True
+#             comp["manual_review"]["notes"] = "Auto-removed by wire connection check"
+
+#             disconnected_boxes += 1
+#             # .append(
+#             #     {
+#             #         "component_id": comp["component_id"],
+#             #         "idx": i,
+#             #         "cls_id": det.cls_id,
+#             #         "box": det.to_xyxy(),
+#             #         "details": info,
+#             #         "removed_from_current": True,
+#             #     }
+#             # )
 
 
-#     return disconnected_boxes
+#     return kept_dets, kept_components, disconnected_boxes
 def run_wire_checks(
     neededdebug: bool,
     binary_img: np.ndarray,
@@ -529,36 +838,29 @@ def run_wire_checks(
     expand_max: int,
     min_black_pixels: int,
     skip_wire_check_classes: set[int],
-) -> Tuple[List[Det], List[Dict], List[Dict]]:
+) -> Tuple[List[Det], List[Dict], int, bool]:
     """
-    Run wire checks on current components.
+    Remove disconnected boxes.
 
     Returns:
-      - kept_dets: components that passed / were kept
-      - kept_components: JSON component entries that remain in components_current
-      - disconnected_boxes: removed components recorded for audit/debug
+      - kept_dets
+      - kept_components
+      - disconnected_removed_count
+      - has_disconnected_removal
     """
     kept_dets: List[Det] = []
     kept_components: List[Dict] = []
-    disconnected_boxes = 0
+    disconnected_removed_count = 0
 
     for i, det in enumerate(dets):
         comp = current_components[i]
 
         if det.cls_id in skip_wire_check_classes:
-            comp["wire_connection"] = {
-                "checked": False,
-                "connected": None,
-                "connected_at_expand_px": None,
-                "checks": [],
-                "skipped": True,
-                "skip_reason": "class_in_skip_wire_check_classes",
-            }
             kept_dets.append(det)
             kept_components.append(comp)
             continue
 
-        connected, info = has_wire_connection(
+        connected, _ = has_wire_connection(
             neededdebug,
             binary_img=binary_img,
             det=det,
@@ -567,30 +869,19 @@ def run_wire_checks(
             min_black_pixels=min_black_pixels,
         )
 
-        info["skipped"] = False
-        comp["wire_connection"] = info
-
         if connected:
             kept_dets.append(det)
             kept_components.append(comp)
         else:
-            comp["flags"]["disconnected"] = True  # has been removed
-            comp["manual_review"]["deleted"] = True
-            comp["manual_review"]["notes"] = "Auto-removed by wire connection check"
+            disconnected_removed_count += 1
 
-            disconnected_boxes += 1
-            # .append(
-            #     {
-            #         "component_id": comp["component_id"],
-            #         "idx": i,
-            #         "cls_id": det.cls_id,
-            #         "box": det.to_xyxy(),
-            #         "details": info,
-            #         "removed_from_current": True,
-            #     }
-            # )
-
-    return kept_dets, kept_components, disconnected_boxes
+    has_disconnected_removal = disconnected_removed_count > 0
+    return (
+        kept_dets,
+        kept_components,
+        disconnected_removed_count,
+        has_disconnected_removal,
+    )
 
 
 # =========================
@@ -598,42 +889,76 @@ def run_wire_checks(
 # =========================
 
 
+# def build_image_json(
+#     image_path: Path,
+#     image_width: int,
+#     image_height: int,
+#     raw_components: List[Dict],
+#     current_components: List[Dict],
+#     merged_same_class_count: int,
+#     cross_class_overlap_pairs: List[Dict],
+#     disconnected_boxes: List[Dict],
+# ) -> Dict:
+#     cross_class_overlap_flag = len(cross_class_overlap_pairs) > 0
+#     # disconnected_component_flag = len(disconnected_boxes) > 0
+#     final_flag = cross_class_overlap_flag  # or disconnected_component_flag
+#     removed_disconnected_components_flag = disconnected_boxes > 0
+
+
+#     return {
+#         "image_name": image_path.name,
+#         "image_path": str(image_path),
+#         "image_width": image_width,
+#         "image_height": image_height,
+#         "flags": {
+#             "cross_class_overlap_flag": cross_class_overlap_flag,
+#             "disconnected_component_flag": removed_disconnected_components_flag,
+#             "final_flag": final_flag,
+#         },
+#         "summary": {
+#             "raw_component_count": len(raw_components),
+#             "merged_component_count": len(current_components),
+#             "merged_same_class_count": merged_same_class_count,
+#             "cross_class_overlap_pair_count": len(cross_class_overlap_pairs),
+#             "auto_removed_disconnected_count": disconnected_boxes,
+#         },
+#         "cross_class_overlap_pairs": cross_class_overlap_pairs,
+#         # "disconnected_components": disconnected_boxes,
+#         "components_raw": raw_components,
+#         "components_current": current_components,
+#     }
 def build_image_json(
     image_path: Path,
     image_width: int,
     image_height: int,
-    raw_components: List[Dict],
-    current_components: List[Dict],
+    final_components: List[Dict],
+    raw_component_count: int,
+    final_component_count: int,
     merged_same_class_count: int,
-    cross_class_overlap_pairs: List[Dict],
-    disconnected_boxes: List[Dict],
+    removed_cross_class_count: int,
+    removed_disconnected_count: int,
+    has_same_class_merge: bool,
+    has_cross_class_resolve: bool,
+    has_disconnected_removal: bool,
 ) -> Dict:
-    cross_class_overlap_flag = len(cross_class_overlap_pairs) > 0
-    # disconnected_component_flag = len(disconnected_boxes) > 0
-    final_flag = cross_class_overlap_flag  # or disconnected_component_flag
-    removed_disconnected_components_flag = disconnected_boxes > 0
-
     return {
         "image_name": image_path.name,
         "image_path": str(image_path),
         "image_width": image_width,
         "image_height": image_height,
         "flags": {
-            "cross_class_overlap_flag": cross_class_overlap_flag,
-            "disconnected_component_flag": removed_disconnected_components_flag,
-            "final_flag": final_flag,
+            "has_same_class_merge": has_same_class_merge,
+            "has_disconnected_removal": has_disconnected_removal,
+            "has_cross_class_resolve": has_cross_class_resolve,
         },
         "summary": {
-            "raw_component_count": len(raw_components),
-            "merged_component_count": len(current_components),
+            "raw_component_count": raw_component_count,
+            "final_component_count": final_component_count,
             "merged_same_class_count": merged_same_class_count,
-            "cross_class_overlap_pair_count": len(cross_class_overlap_pairs),
-            "auto_removed_disconnected_count": disconnected_boxes,
+            "removed_cross_class_count": removed_cross_class_count,
+            "removed_disconnected_count": removed_disconnected_count,
         },
-        "cross_class_overlap_pairs": cross_class_overlap_pairs,
-        # "disconnected_components": disconnected_boxes,
-        "components_raw": raw_components,
-        "components_current": current_components,
+        "components": final_components,
     }
 
 
@@ -643,8 +968,35 @@ def save_image_json(data: Dict, out_path: Path):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
+# def save_yolo_txt_from_components(
+#     components_current: List[Dict],
+#     out_txt: Path,
+#     img_w: int,
+#     img_h: int,
+# ):
+#     out_txt.parent.mkdir(parents=True, exist_ok=True)
+
+#     with open(out_txt, "w", encoding="utf-8") as f:
+#         for comp in components_current:
+#             if comp["manual_review"]["deleted"]:
+#                 continue
+
+#             cls_id = comp["class_id"]
+#             conf = comp["confidence"]
+#             x1, y1, x2, y2 = comp["bbox_xyxy"]
+
+
+#             det = Det(
+#                 cls_id=cls_id,
+#                 conf=conf,
+#                 x1=x1,
+#                 y1=y1,
+#                 x2=x2,
+#                 y2=y2,
+#             )
+#             f.write(det.to_yolo_line(img_w, img_h) + "\n")
 def save_yolo_txt_from_components(
-    components_current: List[Dict],
+    components: List[Dict],
     out_txt: Path,
     img_w: int,
     img_h: int,
@@ -652,10 +1004,7 @@ def save_yolo_txt_from_components(
     out_txt.parent.mkdir(parents=True, exist_ok=True)
 
     with open(out_txt, "w", encoding="utf-8") as f:
-        for comp in components_current:
-            if comp["manual_review"]["deleted"]:
-                continue
-
+        for comp in components:
             cls_id = comp["class_id"]
             conf = comp["confidence"]
             x1, y1, x2, y2 = comp["bbox_xyxy"]
@@ -736,6 +1085,113 @@ def save_index_json(index_list: List[Dict], out_path: Path):
 # =========================
 
 
+# def validate_one_image(
+#     image_path: Path,
+#     label_path: Path,
+#     json_out_path: Path,
+#     vis_out_path: Path,
+#     export_txt_out_path: Optional[Path],
+#     same_class_overlap_thr: float,
+#     diff_class_overlap_thr: float,
+#     expand_min: int,
+#     expand_max: int,
+#     min_black_pixels: int,
+#     skip_wire_check_classes: set[int],
+#     class_id_to_name: Optional[Dict[int, str]] = None,
+#     export_current_labels_txt: bool = True,
+# ) -> Dict:
+#     binary_img = read_binary_image(image_path)
+#     img_h, img_w = binary_img.shape[:2]
+
+#     # 1) load raw YOLO detections
+#     raw_dets = load_yolo_txt(label_path, img_w, img_h)
+#     raw_components = build_raw_components(
+#         dets=raw_dets,
+#         class_id_to_name=class_id_to_name,
+#     )
+
+#     # 2) merge same-class overlapping detections
+#     merged_dets, current_components, merged_same_class_count = (
+#         merge_same_class_dets_json_first(
+#             dets=raw_dets,
+#             raw_components=raw_components,
+#             same_class_overlap_thr=same_class_overlap_thr,
+#             class_id_to_name=class_id_to_name,
+#         )
+#     )
+
+#     # 3) detect cross-class overlaps
+#     cross_class_overlap_pairs = detect_cross_class_overlaps(
+#         dets=merged_dets,
+#         current_components=current_components,
+#         diff_class_overlap_thr=diff_class_overlap_thr,
+#     )
+
+#     # 4) only if no cross-class overlap, run wire checks
+#     needdebug = False
+#     if "100" in str(image_path):
+#         print(str(image_path))
+#         needdebug = True
+#     disconnected_boxes = 0
+#     if True:  # len(cross_class_overlap_pairs) == 0:
+#         merged_dets, current_components, disconnected_boxes = run_wire_checks(
+#             needdebug,
+#             binary_img=binary_img,
+#             dets=merged_dets,
+#             current_components=current_components,
+#             expand_min=expand_min,
+#             expand_max=expand_max,
+#             min_black_pixels=min_black_pixels,
+#             skip_wire_check_classes=skip_wire_check_classes,
+#         )
+#         if needdebug == True:
+#             needdebug = False
+#     else:
+#         for comp in current_components:
+#             comp["wire_connection"] = {
+#                 "checked": False,
+#                 "connected": None,
+#                 "connected_at_expand_px": None,
+#                 "checks": [],
+#                 "skipped": True,
+#                 "skip_reason": "cross_class_overlap_flagged_first",
+#             }
+
+#     # 5) build JSON object
+#     image_json = build_image_json(
+#         image_path=image_path,
+#         image_width=img_w,
+#         image_height=img_h,
+#         raw_components=raw_components,
+#         current_components=current_components,
+#         merged_same_class_count=merged_same_class_count,
+#         cross_class_overlap_pairs=cross_class_overlap_pairs,
+#         disconnected_boxes=disconnected_boxes,
+#     )
+
+#     # 6) save JSON
+#     save_image_json(image_json, json_out_path)
+
+#     # 7) save visualization
+#     # draw_visualization(
+#     #     img_gray=binary_img,
+#     #     components_current=current_components,
+#     #     cross_pairs=cross_class_overlap_pairs,
+#     #     disconnected_boxes=disconnected_boxes,
+#     #     out_path=vis_out_path,
+#     # )
+
+#     # 8) optional: export current labels txt
+#     if export_current_labels_txt and export_txt_out_path is not None:
+#         save_yolo_txt_from_components(
+#             components_current=current_components,
+#             out_txt=export_txt_out_path,
+#             img_w=img_w,
+#             img_h=img_h,
+#         )
+
+
+#     return image_json
 def validate_one_image(
     image_path: Path,
     label_path: Path,
@@ -762,8 +1218,8 @@ def validate_one_image(
     )
 
     # 2) merge same-class overlapping detections
-    merged_dets, current_components, merged_same_class_count = (
-        merge_same_class_dets_json_first(
+    merged_dets, current_components, merged_same_class_count, has_same_class_merge = (
+        merge_same_class_dets(
             dets=raw_dets,
             raw_components=raw_components,
             same_class_overlap_thr=same_class_overlap_thr,
@@ -771,71 +1227,63 @@ def validate_one_image(
         )
     )
 
-    # 3) detect cross-class overlaps
-    cross_class_overlap_pairs = detect_cross_class_overlaps(
+    # 3) resolve cross-class overlaps
+    (
+        resolved_dets,
+        resolved_components,
+        removed_cross_class_count,
+        has_cross_class_resolve,
+    ) = resolve_cross_class_overlaps(
         dets=merged_dets,
         current_components=current_components,
         diff_class_overlap_thr=diff_class_overlap_thr,
     )
 
-    # 4) only if no cross-class overlap, run wire checks
+    # 4) remove disconnected boxes
     needdebug = False
     if "100" in str(image_path):
         print(str(image_path))
         needdebug = True
-    disconnected_boxes = 0
-    if len(cross_class_overlap_pairs) == 0:
-        merged_dets, current_components, disconnected_boxes = run_wire_checks(
-            needdebug,
-            binary_img=binary_img,
-            dets=merged_dets,
-            current_components=current_components,
-            expand_min=expand_min,
-            expand_max=expand_max,
-            min_black_pixels=min_black_pixels,
-            skip_wire_check_classes=skip_wire_check_classes,
-        )
-        if needdebug == True:
-            needdebug = False
-    else:
-        for comp in current_components:
-            comp["wire_connection"] = {
-                "checked": False,
-                "connected": None,
-                "connected_at_expand_px": None,
-                "checks": [],
-                "skipped": True,
-                "skip_reason": "cross_class_overlap_flagged_first",
-            }
 
-    # 5) build JSON object
+    (
+        final_dets,
+        final_components,
+        removed_disconnected_count,
+        has_disconnected_removal,
+    ) = run_wire_checks(
+        neededdebug=needdebug,
+        binary_img=binary_img,
+        dets=resolved_dets,
+        current_components=resolved_components,
+        expand_min=expand_min,
+        expand_max=expand_max,
+        min_black_pixels=min_black_pixels,
+        skip_wire_check_classes=skip_wire_check_classes,
+    )
+
+    # 5) build simple JSON
     image_json = build_image_json(
         image_path=image_path,
         image_width=img_w,
         image_height=img_h,
-        raw_components=raw_components,
-        current_components=current_components,
+        final_components=final_components,
+        raw_component_count=len(raw_components),
+        final_component_count=len(final_components),
         merged_same_class_count=merged_same_class_count,
-        cross_class_overlap_pairs=cross_class_overlap_pairs,
-        disconnected_boxes=disconnected_boxes,
+        removed_cross_class_count=removed_cross_class_count,
+        removed_disconnected_count=removed_disconnected_count,
+        has_same_class_merge=has_same_class_merge,
+        has_cross_class_resolve=has_cross_class_resolve,
+        has_disconnected_removal=has_disconnected_removal,
     )
 
     # 6) save JSON
     save_image_json(image_json, json_out_path)
 
-    # 7) save visualization
-    # draw_visualization(
-    #     img_gray=binary_img,
-    #     components_current=current_components,
-    #     cross_pairs=cross_class_overlap_pairs,
-    #     disconnected_boxes=disconnected_boxes,
-    #     out_path=vis_out_path,
-    # )
-
-    # 8) optional: export current labels txt
+    # 7) export final labels txt
     if export_current_labels_txt and export_txt_out_path is not None:
         save_yolo_txt_from_components(
-            components_current=current_components,
+            components=final_components,
             out_txt=export_txt_out_path,
             img_w=img_w,
             img_h=img_h,
@@ -849,6 +1297,98 @@ def validate_one_image(
 # =========================
 
 
+# def validate_folder(cfg: dict):
+#     pred_root = Path(cfg["output_dir"]) / "yolo_pred"
+#     output_dir = Path(cfg["output_dir"]) / "postcheck"
+
+#     labels_dir = pred_root / "labels"
+#     images_dir = Path(cfg["preprocessed_imgs"])
+
+#     json_dir = output_dir / "json"
+#     vis_dir = output_dir / "validation_vis"
+#     export_label_dir = output_dir / "export_labels"
+#     index_json_path = output_dir / "index.json"
+
+#     same_class_overlap_thr = cfg.get("same_class_overlap_thr", 0.6)
+#     diff_class_overlap_thr = cfg.get("diff_class_overlap_thr", 0.35)
+#     expand_min = cfg.get("expand_min", 1)
+#     expand_max = cfg.get("expand_max", 5)
+#     min_black_pixels = cfg.get("min_black_pixels", 3)
+#     skip_wire_check_classes = set(cfg.get("skip_wire_check_classes", []))
+#     image_exts = cfg.get(
+#         "image_exts", [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"]
+#     )
+#     export_current_labels_txt = cfg.get("export_current_labels_txt", True)
+
+#     class_id_to_name_raw = cfg.get("class_id_to_name", None)
+#     if class_id_to_name_raw is not None:
+#         class_id_to_name = {int(k): v for k, v in class_id_to_name_raw.items()}
+#     else:
+#         class_id_to_name = None
+
+#     image_paths = find_images(images_dir, image_exts)
+#     index_list = []
+
+#     for image_path in image_paths:
+#         label_path = labels_dir / f"{image_path.stem}.txt"
+#         json_out_path = json_dir / f"{image_path.stem}.json"
+#         vis_out_path = vis_dir / image_path.name
+#         export_txt_out_path = export_label_dir / f"{image_path.stem}.txt"
+
+#         image_json = validate_one_image(
+#             image_path=image_path,
+#             label_path=label_path,
+#             json_out_path=json_out_path,
+#             vis_out_path=vis_out_path,
+#             export_txt_out_path=export_txt_out_path,
+#             same_class_overlap_thr=same_class_overlap_thr,
+#             diff_class_overlap_thr=diff_class_overlap_thr,
+#             expand_min=expand_min,
+#             expand_max=expand_max,
+#             min_black_pixels=min_black_pixels,
+#             skip_wire_check_classes=skip_wire_check_classes,
+#             class_id_to_name=class_id_to_name,
+#             export_current_labels_txt=export_current_labels_txt,
+#         )
+
+#         final_flag = image_json["flags"]["final_flag"]
+#         raw_count = image_json["summary"]["raw_component_count"]
+#         merged_count = image_json["summary"]["merged_component_count"]
+
+#         index_list.append(
+#             {
+#                 "image_name": image_json["image_name"],
+#                 "image_path": image_json["image_path"],
+#                 "json_path": str(json_out_path),
+#                 "visualization_path": str(vis_out_path),
+#                 "export_label_path": (
+#                     str(export_txt_out_path) if export_current_labels_txt else None
+#                 ),
+#                 "final_flag": final_flag,
+#                 "cross_class_overlap_flag": image_json["flags"][
+#                     "cross_class_overlap_flag"
+#                 ],
+#                 "disconnected_component_flag": image_json["flags"][
+#                     "disconnected_component_flag"
+#                 ],
+#                 "raw_component_count": raw_count,
+#                 "merged_component_count": merged_count,
+#             }
+#         )
+
+#         print(
+#             f"[CHECKED] {image_json['image_name']} | "
+#             f"raw={raw_count} | "
+#             f"current={merged_count} | "
+#             f"cross_flag={image_json['flags']['cross_class_overlap_flag']} | "
+#             f"disconnect_flag={image_json['flags']['disconnected_component_flag']} | "
+#             f"final_flag={final_flag}"
+#         )
+
+
+#     save_index_json(index_list, index_json_path)
+#     print(f"[DONE] Per-image JSON saved to: {json_dir}")
+#     print(f"[DONE] Index JSON saved to: {index_json_path}")
 def validate_folder(cfg: dict):
     pred_root = Path(cfg["output_dir"]) / "yolo_pred"
     output_dir = Path(cfg["output_dir"]) / "postcheck"
@@ -857,7 +1397,6 @@ def validate_folder(cfg: dict):
     images_dir = Path(cfg["preprocessed_imgs"])
 
     json_dir = output_dir / "json"
-    vis_dir = output_dir / "validation_vis"
     export_label_dir = output_dir / "export_labels"
     index_json_path = output_dir / "index.json"
 
@@ -884,14 +1423,13 @@ def validate_folder(cfg: dict):
     for image_path in image_paths:
         label_path = labels_dir / f"{image_path.stem}.txt"
         json_out_path = json_dir / f"{image_path.stem}.json"
-        vis_out_path = vis_dir / image_path.name
         export_txt_out_path = export_label_dir / f"{image_path.stem}.txt"
 
         image_json = validate_one_image(
             image_path=image_path,
             label_path=label_path,
             json_out_path=json_out_path,
-            vis_out_path=vis_out_path,
+            vis_out_path=Path("unused"),
             export_txt_out_path=export_txt_out_path,
             same_class_overlap_thr=same_class_overlap_thr,
             diff_class_overlap_thr=diff_class_overlap_thr,
@@ -903,38 +1441,33 @@ def validate_folder(cfg: dict):
             export_current_labels_txt=export_current_labels_txt,
         )
 
-        final_flag = image_json["flags"]["final_flag"]
-        raw_count = image_json["summary"]["raw_component_count"]
-        merged_count = image_json["summary"]["merged_component_count"]
-
         index_list.append(
             {
                 "image_name": image_json["image_name"],
                 "image_path": image_json["image_path"],
                 "json_path": str(json_out_path),
-                "visualization_path": str(vis_out_path),
                 "export_label_path": (
                     str(export_txt_out_path) if export_current_labels_txt else None
                 ),
-                "final_flag": final_flag,
-                "cross_class_overlap_flag": image_json["flags"][
-                    "cross_class_overlap_flag"
+                "has_same_class_merge": image_json["flags"]["has_same_class_merge"],
+                "has_disconnected_removal": image_json["flags"][
+                    "has_disconnected_removal"
                 ],
-                "disconnected_component_flag": image_json["flags"][
-                    "disconnected_component_flag"
+                "has_cross_class_resolve": image_json["flags"][
+                    "has_cross_class_resolve"
                 ],
-                "raw_component_count": raw_count,
-                "merged_component_count": merged_count,
+                "raw_component_count": image_json["summary"]["raw_component_count"],
+                "final_component_count": image_json["summary"]["final_component_count"],
             }
         )
 
         print(
             f"[CHECKED] {image_json['image_name']} | "
-            f"raw={raw_count} | "
-            f"current={merged_count} | "
-            f"cross_flag={image_json['flags']['cross_class_overlap_flag']} | "
-            f"disconnect_flag={image_json['flags']['disconnected_component_flag']} | "
-            f"final_flag={final_flag}"
+            f"raw={image_json['summary']['raw_component_count']} | "
+            f"final={image_json['summary']['final_component_count']} | "
+            f"merge={image_json['flags']['has_same_class_merge']} | "
+            f"disconnect_removed={image_json['flags']['has_disconnected_removal']} | "
+            f"cross_resolved={image_json['flags']['has_cross_class_resolve']}"
         )
 
     save_index_json(index_list, index_json_path)
