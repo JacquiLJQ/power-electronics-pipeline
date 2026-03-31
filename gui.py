@@ -243,7 +243,9 @@ class IntegratedCircuitGUI:
 
     def point_in_xyxy(self, x, y, box, expand=0):
         x1, y1, x2, y2 = box
-        return (x1 - expand) <= x <= (x2 + expand) and (y1 - expand) <= y <= (y2 + expand)
+        return (x1 - expand) <= x <= (x2 + expand) and (y1 - expand) <= y <= (
+            y2 + expand
+        )
 
     def box_area_xyxy(self, box):
         x1, y1, x2, y2 = box
@@ -283,15 +285,27 @@ class IntegratedCircuitGUI:
         topbar = ttk.Frame(left)
         topbar.pack(side="top", fill="x")
 
-        self.stage_label = ttk.Label(topbar, text="Stage: Component Review", font=("Arial", 12, "bold"))
+        self.stage_label = ttk.Label(
+            topbar, text="Stage: Component Review", font=("Arial", 12, "bold")
+        )
         self.stage_label.pack(side="left", padx=(0, 12))
 
-        ttk.Button(topbar, text="Enter Node Stage", command=self.enter_node_stage).pack(side="left", padx=4)
-        ttk.Button(topbar, text="Back To Component", command=self.back_to_component_stage).pack(side="left", padx=4)
-        ttk.Button(topbar, text="Re-run Auto Nodes", command=self.rerun_auto_nodes).pack(side="left", padx=4)
-        ttk.Button(topbar, text="Save Final", command=self.save_all_outputs).pack(side="left", padx=12)
+        ttk.Button(topbar, text="Enter Node Stage", command=self.enter_node_stage).pack(
+            side="left", padx=4
+        )
+        ttk.Button(
+            topbar, text="Back To Component", command=self.back_to_component_stage
+        ).pack(side="left", padx=4)
+        ttk.Button(
+            topbar, text="Re-run Auto Nodes", command=self.rerun_auto_nodes
+        ).pack(side="left", padx=4)
+        ttk.Button(topbar, text="Save Final", command=self.save_all_outputs).pack(
+            side="left", padx=12
+        )
 
-        self.canvas = tk.Canvas(left, width=self.canvas_width, height=self.canvas_height, bg="gray20")
+        self.canvas = tk.Canvas(
+            left, width=self.canvas_width, height=self.canvas_height, bg="gray20"
+        )
         self.canvas.pack(side="top", fill="both", expand=True)
         self.canvas.bind("<Configure>", self.on_canvas_configure)
         self.canvas.bind("<ButtonPress-1>", self.on_left_press)
@@ -322,15 +336,29 @@ class IntegratedCircuitGUI:
         self.root.bind("<KeyPress-u>", lambda e: self.undo_node_action())
 
     def build_component_panel(self, parent):
-        ttk.Label(parent, text="Review Panel", font=("Arial", 14, "bold")).pack(anchor="w", pady=(4, 8))
+        ttk.Label(parent, text="Review Panel", font=("Arial", 14, "bold")).pack(
+            anchor="w", pady=(4, 8)
+        )
 
         ctrl = ttk.Frame(parent)
         ctrl.pack(fill="x", pady=(0, 8))
-        ttk.Button(ctrl, text="Change Selected Class", command=self.change_selected_component_class).pack(fill="x", pady=2)
-        ttk.Button(ctrl, text="Clear Component Selection", command=self.clear_component_selection).pack(fill="x", pady=2)
-        ttk.Checkbutton(ctrl, text="Delete Mode", variable=self.delete_mode).pack(anchor="w", pady=4)
+        ttk.Button(
+            ctrl,
+            text="Change Selected Class",
+            command=self.change_selected_component_class,
+        ).pack(fill="x", pady=2)
+        ttk.Button(
+            ctrl,
+            text="Clear Component Selection",
+            command=self.clear_component_selection,
+        ).pack(fill="x", pady=2)
+        ttk.Checkbutton(ctrl, text="Delete Mode", variable=self.delete_mode).pack(
+            anchor="w", pady=4
+        )
 
-        ttk.Label(parent, text="Target Class", font=("Arial", 12, "bold")).pack(anchor="w", pady=(8, 4))
+        ttk.Label(parent, text="Target Class", font=("Arial", 12, "bold")).pack(
+            anchor="w", pady=(8, 4)
+        )
         class_frame = ttk.Frame(parent)
         class_frame.pack(fill="x", pady=(0, 8))
         for cls_id in sorted(self.class_id_to_name):
@@ -341,11 +369,15 @@ class IntegratedCircuitGUI:
                 variable=self.selected_class_id,
             ).pack(anchor="w")
 
-        ttk.Label(parent, text="Info", font=("Arial", 12, "bold")).pack(anchor="w", pady=(8, 4))
+        ttk.Label(parent, text="Info", font=("Arial", 12, "bold")).pack(
+            anchor="w", pady=(8, 4)
+        )
         self.component_info_text = tk.Text(parent, width=56, height=22, wrap="word")
         self.component_info_text.pack(fill="both", expand=False, pady=(0, 8))
 
-        ttk.Label(parent, text="Instructions", font=("Arial", 12, "bold")).pack(anchor="w", pady=(8, 4))
+        ttk.Label(parent, text="Instructions", font=("Arial", 12, "bold")).pack(
+            anchor="w", pady=(8, 4)
+        )
         self.component_legend_text = tk.Text(parent, width=56, height=12, wrap="word")
         self.component_legend_text.pack(fill="both", expand=True)
         self.component_legend_text.insert(
@@ -360,29 +392,69 @@ class IntegratedCircuitGUI:
         self.component_legend_text.config(state="disabled")
 
     def build_node_panel(self, parent):
-        ttk.Label(parent, text="Node Annotation", font=("Arial", 14, "bold")).pack(anchor="w", pady=(4, 8))
+        ttk.Label(parent, text="Node Annotation", font=("Arial", 14, "bold")).pack(
+            anchor="w", pady=(4, 8)
+        )
 
         ctrl = ttk.Frame(parent)
         ctrl.pack(fill="x", pady=(0, 8))
-        ttk.Checkbutton(ctrl, text="Merge Mode (m)", variable=self.merge_mode, command=self.on_toggle_merge).pack(anchor="w", pady=2)
-        ttk.Checkbutton(ctrl, text="Connect Mode (c)", variable=self.connect_mode, command=self.on_toggle_connect).pack(anchor="w", pady=2)
-        ttk.Checkbutton(ctrl, text="Add Node Mode", variable=self.add_node_mode, command=self.on_toggle_add_node).pack(anchor="w", pady=2)
-        ttk.Checkbutton(ctrl, text="Show All Connections", variable=self.show_all_connections, command=self.on_toggle_show_all_connections).pack(anchor="w", pady=2)
-        ttk.Button(ctrl, text="Delete Selected Node", command=self.delete_selected_node).pack(fill="x", pady=2)
-        ttk.Button(ctrl, text="Delete Selected Connection", command=self.delete_selected_connection).pack(fill="x", pady=2)
-        ttk.Button(ctrl, text="Undo Node Action (u)", command=self.undo_node_action).pack(fill="x", pady=2)
-        ttk.Button(ctrl, text="Clear Node Focus", command=self.reset_node_focus).pack(fill="x", pady=2)
+        ttk.Checkbutton(
+            ctrl,
+            text="Merge Mode (m)",
+            variable=self.merge_mode,
+            command=self.on_toggle_merge,
+        ).pack(anchor="w", pady=2)
+        ttk.Checkbutton(
+            ctrl,
+            text="Connect Mode (c)",
+            variable=self.connect_mode,
+            command=self.on_toggle_connect,
+        ).pack(anchor="w", pady=2)
+        ttk.Checkbutton(
+            ctrl,
+            text="Add Node Mode",
+            variable=self.add_node_mode,
+            command=self.on_toggle_add_node,
+        ).pack(anchor="w", pady=2)
+        ttk.Checkbutton(
+            ctrl,
+            text="Show All Connections",
+            variable=self.show_all_connections,
+            command=self.on_toggle_show_all_connections,
+        ).pack(anchor="w", pady=2)
+        ttk.Button(
+            ctrl, text="Delete Selected Node", command=self.delete_selected_node
+        ).pack(fill="x", pady=2)
+        ttk.Button(
+            ctrl,
+            text="Delete Selected Connection",
+            command=self.delete_selected_connection,
+        ).pack(fill="x", pady=2)
+        ttk.Button(
+            ctrl, text="Undo Node Action (u)", command=self.undo_node_action
+        ).pack(fill="x", pady=2)
+        ttk.Button(ctrl, text="Clear Node Focus", command=self.reset_node_focus).pack(
+            fill="x", pady=2
+        )
 
-        ttk.Label(parent, text="Node Summary", font=("Arial", 12, "bold")).pack(anchor="w", pady=(8, 4))
+        ttk.Label(parent, text="Node Summary", font=("Arial", 12, "bold")).pack(
+            anchor="w", pady=(8, 4)
+        )
         self.node_info_text = tk.Text(parent, width=56, height=12, wrap="word")
         self.node_info_text.pack(fill="x", pady=(0, 8))
 
         lists = ttk.Frame(parent)
         lists.pack(fill="both", expand=True)
 
-        ttk.Label(lists, text="Nodes").grid(row=0, column=0, padx=4, pady=(0, 4), sticky="w")
-        ttk.Label(lists, text="Components").grid(row=0, column=1, padx=4, pady=(0, 4), sticky="w")
-        ttk.Label(lists, text="Connections").grid(row=0, column=2, padx=4, pady=(0, 4), sticky="w")
+        ttk.Label(lists, text="Nodes").grid(
+            row=0, column=0, padx=4, pady=(0, 4), sticky="w"
+        )
+        ttk.Label(lists, text="Components").grid(
+            row=0, column=1, padx=4, pady=(0, 4), sticky="w"
+        )
+        ttk.Label(lists, text="Connections").grid(
+            row=0, column=2, padx=4, pady=(0, 4), sticky="w"
+        )
 
         self.nodes_list = tk.Listbox(lists, width=18, height=18, exportselection=False)
         self.comps_list = tk.Listbox(lists, width=22, height=18, exportselection=False)
@@ -407,7 +479,9 @@ class IntegratedCircuitGUI:
         candidates = []
         for comp in self.components:
             if self.point_in_xyxy(x, y, comp.bbox_xyxy, expand=self.click_box_expand):
-                candidates.append((self.box_area_xyxy(comp.bbox_xyxy), comp.component_id))
+                candidates.append(
+                    (self.box_area_xyxy(comp.bbox_xyxy), comp.component_id)
+                )
         if not candidates:
             return None
         candidates.sort()
@@ -454,7 +528,9 @@ class IntegratedCircuitGUI:
         self.selected_component_ids.discard(component_id)
 
         # Also remove stale connections if component deleted after returning from node stage
-        self.connections = [c for c in self.connections if c.component_id != component_id]
+        self.connections = [
+            c for c in self.connections if c.component_id != component_id
+        ]
         self.rebuild_connection_index()
         self.set_status(f"Deleted component {component_id}")
         return True
@@ -467,7 +543,10 @@ class IntegratedCircuitGUI:
         new_name = self.class_id_to_name.get(new_cls_id, f"cls_{new_cls_id}")
         changed = 0
         for comp in self.components:
-            if comp.component_id in self.selected_component_ids and comp.class_id != new_cls_id:
+            if (
+                comp.component_id in self.selected_component_ids
+                and comp.class_id != new_cls_id
+            ):
                 comp.class_id = new_cls_id
                 comp.class_name = new_name
                 comp.source = "manual_class_change"
@@ -520,7 +599,9 @@ class IntegratedCircuitGUI:
             if area < min_area:
                 continue
             cx, cy = centroids[lab].tolist()
-            auto_nodes.append(AutoNode(new_id, int(area), (x, y, w, h), (float(cx), float(cy))))
+            auto_nodes.append(
+                AutoNode(new_id, int(area), (x, y, w, h), (float(cx), float(cy)))
+            )
             label_map[labels == lab] = new_id
             new_id += 1
         return auto_nodes, label_map
@@ -533,11 +614,61 @@ class IntegratedCircuitGUI:
         outer_y2 = min(self.image_h - 1, y2 + pad)
 
         mask = np.zeros((self.image_h, self.image_w), dtype=np.uint8)
-        mask[outer_y1:outer_y2 + 1, outer_x1:outer_x2 + 1] = 255
-        mask[y1:y2 + 1, x1:x2 + 1] = 0
+        mask[outer_y1 : outer_y2 + 1, outer_x1 : outer_x2 + 1] = 255
+        mask[y1 : y2 + 1, x1 : x2 + 1] = 0
         return mask
 
-    def auto_detect_component_connections(self, pad: int = 3, min_pixels: int = 2) -> List[Connection]:
+    def get_unconnected_node_ids(self):
+        connected_ids = {c.node_id for c in self.connections}
+        return [gid for gid in sorted(self.group_by_id) if gid not in connected_ids]
+
+    def prune_unconnected_nodes(self, delete_manual=False):
+        # 统计每个 node 连了多少个 component
+        conn_count = {}
+        for c in self.connections:
+            conn_count[c.node_id] = conn_count.get(c.node_id, 0) + 1
+
+        removed = []
+        for gid in list(sorted(self.group_by_id)):
+            # 现在要求：node 至少连接 2 个 component，否则删掉
+            if conn_count.get(gid, 0) >= 2:
+                continue
+
+            group = self.group_by_id.get(gid)
+            if group is None:
+                continue
+
+            is_manual_only = len(group.members_auto) == 0
+            if is_manual_only and not delete_manual:
+                continue
+
+            for mid in group.members_manual:
+                self.manual_by_id.pop(mid, None)
+            self.group_by_id.pop(gid, None)
+            removed.append(gid)
+
+            if self.selected_node_group_id == gid:
+                self.selected_node_group_id = None
+            if self.pending_merge_first == gid:
+                self.pending_merge_first = None
+            if self.current_connect_node == gid:
+                self.current_connect_node = None
+
+        if removed:
+            # 顺便把指向已删除 node 的 connection 清掉，更稳一点
+            removed_set = set(removed)
+            self.connections = [
+                c for c in self.connections if c.node_id not in removed_set
+            ]
+
+            self.selected_connection_index = None
+            self.rebuild_connection_index()
+
+        return removed
+
+    def auto_detect_component_connections(
+        self, pad: int = 3, min_pixels: int = 2
+    ) -> List[Connection]:
         if self.label_map is None:
             return []
 
@@ -549,14 +680,18 @@ class IntegratedCircuitGUI:
             if ring_node_ids.size == 0:
                 continue
 
-            node_ids, counts = np.unique(ring_node_ids[ring_node_ids > 0], return_counts=True)
+            node_ids, counts = np.unique(
+                ring_node_ids[ring_node_ids > 0], return_counts=True
+            )
             for node_id, count in zip(node_ids.tolist(), counts.tolist()):
                 if count < min_pixels:
                     continue
                 key = (int(node_id), comp.component_id)
                 if key in seen or int(node_id) not in self.group_by_id:
                     continue
-                auto_connections.append(Connection(node_id=int(node_id), component_id=comp.component_id))
+                auto_connections.append(
+                    Connection(node_id=int(node_id), component_id=comp.component_id)
+                )
                 seen.add(key)
         return auto_connections
 
@@ -586,7 +721,9 @@ class IntegratedCircuitGUI:
         else:
             # Keep only connections pointing to existing components.
             existing_ids = {c.component_id for c in self.components}
-            self.connections = [c for c in self.connections if c.component_id in existing_ids]
+            self.connections = [
+                c for c in self.connections if c.component_id in existing_ids
+            ]
 
         self.group_by_id = {
             n.id: NodeGroup(id=n.id, members_auto=[n.id], members_manual=[])
@@ -595,7 +732,9 @@ class IntegratedCircuitGUI:
 
         if not reset_existing and self.manual_by_id:
             for mid in sorted(self.manual_by_id):
-                self.group_by_id[mid] = NodeGroup(id=mid, members_auto=[], members_manual=[mid])
+                self.group_by_id[mid] = NodeGroup(
+                    id=mid, members_auto=[], members_manual=[mid]
+                )
 
         auto_connections = self.auto_detect_component_connections(
             pad=self.node_params["auto_conn_pad"],
@@ -604,16 +743,20 @@ class IntegratedCircuitGUI:
         if reset_existing or not self.connections:
             self.connections = auto_connections
         else:
-            self.connections = self.unique_connections(self.connections + auto_connections)
+            self.connections = self.unique_connections(
+                self.connections + auto_connections
+            )
 
+        removed_unconnected = self.prune_unconnected_nodes(delete_manual=False)
         self.rebuild_connection_index()
         self.selected_node_group_id = None
         self.selected_connection_index = None
         self.pending_merge_first = None
         self.current_connect_node = None
-        self.next_manual_id = (max([n.id for n in self.auto_nodes], default=0) + 1)
+        self.next_manual_id = max([n.id for n in self.auto_nodes], default=0) + 1
         while self.next_manual_id in self.manual_by_id:
             self.next_manual_id += 1
+        # return removed_unconnected
 
     def enter_node_stage(self):
         self.init_node_state_from_components(reset_existing=False)
@@ -659,7 +802,9 @@ class IntegratedCircuitGUI:
         if self.connect_mode.get():
             self.merge_mode.set(False)
             self.pending_merge_first = None
-            self.set_status("Connect Mode ON: select a node, then select/click a component")
+            self.set_status(
+                "Connect Mode ON: select a node, then select/click a component"
+            )
         else:
             self.current_connect_node = None
             self.set_status("Connect Mode OFF")
@@ -679,11 +824,15 @@ class IntegratedCircuitGUI:
 
     def on_toggle_add_node(self):
         if self.add_node_mode.get():
-            self.set_status("Add Node Mode ON: click empty canvas to add manual node. Existing nodes are color-highlighted.")
+            self.set_status(
+                "Add Node Mode ON: click empty canvas to add manual node. Existing nodes are color-highlighted."
+            )
             self.selected_node_group_id = None
             self.selected_connection_index = None
         else:
-            self.set_status("Add Node Mode OFF: empty canvas click now clears node focus.")
+            self.set_status(
+                "Add Node Mode OFF: empty canvas click now clears node focus."
+            )
         self.refresh_all()
 
     def on_toggle_show_all_connections(self):
@@ -754,8 +903,14 @@ class IntegratedCircuitGUI:
         snapshot = {
             "op": "delete_group",
             "group": asdict(group),
-            "manual_nodes": [asdict(self.manual_by_id[mid]) for mid in group.members_manual if mid in self.manual_by_id],
-            "connections_removed": [asdict(c) for c in self.connections if c.node_id == gid],
+            "manual_nodes": [
+                asdict(self.manual_by_id[mid])
+                for mid in group.members_manual
+                if mid in self.manual_by_id
+            ],
+            "connections_removed": [
+                asdict(c) for c in self.connections if c.node_id == gid
+            ],
         }
         self.undo_stack.append(snapshot)
         for mid in group.members_manual:
@@ -797,7 +952,14 @@ class IntegratedCircuitGUI:
                 seen.add(key)
         self.connections = new_conns
         self.rebuild_connection_index()
-        self.undo_stack.append({"op": "merge_groups", "a_before": before_a, "b_before": before_b, "moved": moved})
+        self.undo_stack.append(
+            {
+                "op": "merge_groups",
+                "a_before": before_a,
+                "b_before": before_b,
+                "moved": moved,
+            }
+        )
         self.pending_merge_first = None
         self.selected_node_group_id = gid_a
         if self.current_connect_node == gid_b:
@@ -812,7 +974,9 @@ class IntegratedCircuitGUI:
             return
         key = (node_id, component_id)
         if key in self.conn_index:
-            self.set_status(f"Connection already exists: node{node_id} -> {component_id}")
+            self.set_status(
+                f"Connection already exists: node{node_id} -> {component_id}"
+            )
             return
         conn = Connection(node_id=node_id, component_id=component_id)
         self.connections.append(conn)
@@ -872,11 +1036,14 @@ class IntegratedCircuitGUI:
             self.group_by_id[b.id] = b
             moved_comp_ids = {m["component_id"] for m in act.get("moved", [])}
             self.connections = [
-                c for c in self.connections
+                c
+                for c in self.connections
                 if not (c.node_id == a.id and c.component_id in moved_comp_ids)
             ]
             for moved in act.get("moved", []):
-                self.connections.append(Connection(node_id=b.id, component_id=moved["component_id"]))
+                self.connections.append(
+                    Connection(node_id=b.id, component_id=moved["component_id"])
+                )
             self.connections = self.unique_connections(self.connections)
             self.rebuild_connection_index()
 
@@ -1017,7 +1184,9 @@ class IntegratedCircuitGUI:
             return
 
         if self.connect_mode.get():
-            self.set_status("Connect Mode ON: select node and component, empty click ignored")
+            self.set_status(
+                "Connect Mode ON: select node and component, empty click ignored"
+            )
             return
 
         if self.add_node_mode.get():
@@ -1094,28 +1263,52 @@ class IntegratedCircuitGUI:
                 width = self.line_width
             draw.rectangle([x1, y1, x2, y2], outline=outline, width=width)
             text = f"{comp.class_id}:{comp.class_name}"
-            self.draw_label_pil(draw, x1, max(0, y1 - 20), text, (0, 255, 0), (0, 0, 0), font, alpha=120)
+            self.draw_label_pil(
+                draw, x1, max(0, y1 - 20), text, (0, 255, 0), (0, 0, 0), font, alpha=120
+            )
         if draft_box is not None:
             x1, y1, x2, y2 = draft_box
             draw.rectangle([x1, y1, x2, y2], outline=(255, 255, 0, 180), width=2)
         return Image.alpha_composite(pil_img.convert("RGBA"), overlay).convert("RGB")
 
-    def draw_group_outline_and_id(self, vis, group: NodeGroup, color=(0, 255, 0), thickness=1):
+    def draw_group_outline_and_id(
+        self, vis, group: NodeGroup, color=(0, 255, 0), thickness=1
+    ):
         mask = self.group_union_mask(group)
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if not contours:
             return
         cv2.drawContours(vis, contours, -1, color, thickness)
         x, y, w, h = cv2.boundingRect(np.vstack(contours))
-        cv2.putText(vis, str(group.id), (x + 2, max(12, y + 12)), cv2.FONT_HERSHEY_SIMPLEX, 0.35, color, 1, cv2.LINE_AA)
+        cv2.putText(
+            vis,
+            str(group.id),
+            (x + 2, max(12, y + 12)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.35,
+            color,
+            1,
+            cv2.LINE_AA,
+        )
 
-    def draw_component_node_mode(self, vis, comp: Component, draw_bbox=False, color=(80, 80, 80)):
+    def draw_component_node_mode(
+        self, vis, comp: Component, draw_bbox=False, color=(80, 80, 80)
+    ):
         x1, y1, x2, y2 = comp.bbox_xyxy
         if draw_bbox:
             cv2.rectangle(vis, (x1, y1), (x2, y2), color, 1)
         tx = x1 + 2
         ty = max(12, y1 - 4)
-        cv2.putText(vis, comp.component_id, (tx, ty), cv2.FONT_HERSHEY_SIMPLEX, 0.32, color, 1, cv2.LINE_AA)
+        cv2.putText(
+            vis,
+            comp.component_id,
+            (tx, ty),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.32,
+            color,
+            1,
+            cv2.LINE_AA,
+        )
 
     def get_group_anchor_point(self, group: NodeGroup) -> Tuple[int, int]:
         if group.members_auto:
@@ -1144,7 +1337,9 @@ class IntegratedCircuitGUI:
             return 0, 0
         return int(round(xs.mean())), int(round(ys.mean()))
 
-    def get_component_marker_positions(self, component_to_nodes: Dict[str, List[int]]) -> Dict[Tuple[str, int], Tuple[int, int]]:
+    def get_component_marker_positions(
+        self, component_to_nodes: Dict[str, List[int]]
+    ) -> Dict[Tuple[str, int], Tuple[int, int]]:
         positions = {}
         step = 14
         for comp in self.components:
@@ -1186,7 +1381,12 @@ class IntegratedCircuitGUI:
             component_to_nodes[k] = sorted(set(component_to_nodes[k]))
         return node_to_components, component_to_nodes
 
-    def draw_connection_markers(self, vis, component_to_nodes: Dict[str, List[int]], selected_node_id: Optional[int] = None):
+    def draw_connection_markers(
+        self,
+        vis,
+        component_to_nodes: Dict[str, List[int]],
+        selected_node_id: Optional[int] = None,
+    ):
         marker_r = 5
         positions = self.get_component_marker_positions(component_to_nodes)
         for comp in self.components:
@@ -1202,9 +1402,23 @@ class IntegratedCircuitGUI:
                 color = self.get_node_color_bgr(nid)
                 cv2.circle(vis, (cx, cy), marker_r, color, -1)
                 cv2.circle(vis, (cx, cy), marker_r + 1, (0, 0, 0), 1)
-                cv2.putText(vis, str(nid), (cx + 8, cy + 4), cv2.FONT_HERSHEY_SIMPLEX, 0.32, color, 1, cv2.LINE_AA)
+                cv2.putText(
+                    vis,
+                    str(nid),
+                    (cx + 8, cy + 4),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.32,
+                    color,
+                    1,
+                    cv2.LINE_AA,
+                )
 
-    def draw_connection_lines(self, vis, component_to_nodes: Dict[str, List[int]], selected_node_id: Optional[int] = None):
+    def draw_connection_lines(
+        self,
+        vis,
+        component_to_nodes: Dict[str, List[int]],
+        selected_node_id: Optional[int] = None,
+    ):
         positions = self.get_component_marker_positions(component_to_nodes)
         for comp in self.components:
             node_ids = component_to_nodes.get(comp.component_id, [])
@@ -1228,43 +1442,77 @@ class IntegratedCircuitGUI:
     def render_node_stage(self):
         node_to_components, component_to_nodes = self.build_connection_maps()
 
-        highlight_all_nodes = self.add_node_mode.get() or self.show_all_connections.get()
-        has_focus = highlight_all_nodes or self.selected_node_group_id is not None or bool(self.selected_component_ids)
-        vis = self.darken(self.image_bgr, alpha=0.25) if has_focus else self.image_bgr.copy()
+        highlight_all_nodes = (
+            self.add_node_mode.get() or self.show_all_connections.get()
+        )
+        has_focus = (
+            highlight_all_nodes
+            or self.selected_node_group_id is not None
+            or bool(self.selected_component_ids)
+        )
+        vis = (
+            self.darken(self.image_bgr, alpha=0.25)
+            if has_focus
+            else self.image_bgr.copy()
+        )
         base_text_color = (155, 155, 155) if has_focus else (90, 90, 90)
 
         for comp in self.components:
-            self.draw_component_node_mode(vis, comp, draw_bbox=False, color=base_text_color)
+            self.draw_component_node_mode(
+                vis, comp, draw_bbox=False, color=base_text_color
+            )
 
         for gid in sorted(self.group_by_id):
             if highlight_all_nodes:
                 color = self.get_node_color_bgr(gid)
             else:
-                color = self.get_node_color_bgr(gid) if node_to_components.get(gid) else (0, 255, 0)
+                color = (
+                    self.get_node_color_bgr(gid)
+                    if node_to_components.get(gid)
+                    else (0, 255, 0)
+                )
             thickness = 2 if gid == self.selected_node_group_id else 1
-            self.draw_group_outline_and_id(vis, self.group_by_id[gid], color=color, thickness=thickness)
+            self.draw_group_outline_and_id(
+                vis, self.group_by_id[gid], color=color, thickness=thickness
+            )
 
         if self.show_all_connections.get():
             self.draw_connection_lines(vis, component_to_nodes)
             self.draw_connection_markers(vis, component_to_nodes)
         elif self.selected_node_group_id is not None:
-            self.draw_connection_lines(vis, component_to_nodes, selected_node_id=self.selected_node_group_id)
-            self.draw_connection_markers(vis, component_to_nodes, selected_node_id=self.selected_node_group_id)
+            self.draw_connection_lines(
+                vis, component_to_nodes, selected_node_id=self.selected_node_group_id
+            )
+            self.draw_connection_markers(
+                vis, component_to_nodes, selected_node_id=self.selected_node_group_id
+            )
         elif not has_focus:
             self.draw_connection_markers(vis, component_to_nodes)
 
-        if self.selected_node_group_id is not None and self.selected_node_group_id in self.group_by_id:
+        if (
+            self.selected_node_group_id is not None
+            and self.selected_node_group_id in self.group_by_id
+        ):
             node_color = self.get_node_color_bgr(self.selected_node_group_id)
-            self.draw_group_outline_and_id(vis, self.group_by_id[self.selected_node_group_id], color=node_color, thickness=2)
+            self.draw_group_outline_and_id(
+                vis,
+                self.group_by_id[self.selected_node_group_id],
+                color=node_color,
+                thickness=2,
+            )
             for comp_id in node_to_components.get(self.selected_node_group_id, []):
                 comp = self.get_component_by_id(comp_id)
                 if comp is not None:
-                    self.draw_component_node_mode(vis, comp, draw_bbox=True, color=node_color)
+                    self.draw_component_node_mode(
+                        vis, comp, draw_bbox=True, color=node_color
+                    )
 
         for cid in self.selected_component_ids:
             comp = self.get_component_by_id(cid)
             if comp is not None:
-                self.draw_component_node_mode(vis, comp, draw_bbox=True, color=(0, 255, 255))
+                self.draw_component_node_mode(
+                    vis, comp, draw_bbox=True, color=(0, 255, 255)
+                )
                 for nid in component_to_nodes.get(cid, []):
                     color = self.get_node_color_bgr(nid)
                     positions = self.get_component_marker_positions(component_to_nodes)
@@ -1276,7 +1524,11 @@ class IntegratedCircuitGUI:
         return Image.fromarray(cv2.cvtColor(vis, cv2.COLOR_BGR2RGB))
 
     def update_canvas(self, draft_box=None):
-        rendered = self.render_component_stage(draft_box) if self.stage == "component" else self.render_node_stage()
+        rendered = (
+            self.render_component_stage(draft_box)
+            if self.stage == "component"
+            else self.render_node_stage()
+        )
 
         self.root.update_idletasks()
         canvas_w = self.canvas.winfo_width()
@@ -1286,7 +1538,9 @@ class IntegratedCircuitGUI:
         if canvas_h <= 1:
             canvas_h = self.canvas_height
 
-        new_w, new_h, scale = self.fit_image_size(rendered.width, rendered.height, canvas_w, canvas_h)
+        new_w, new_h, scale = self.fit_image_size(
+            rendered.width, rendered.height, canvas_w, canvas_h
+        )
         rendered = rendered.resize((new_w, new_h), Image.Resampling.NEAREST)
 
         self.display_scale = scale
@@ -1334,7 +1588,10 @@ class IntegratedCircuitGUI:
             for cid in sorted(self.selected_component_ids):
                 comp = self.get_component_by_id(cid)
                 if comp is not None:
-                    txt.insert(tk.END, f"  {cid} | {comp.class_id}:{comp.class_name} | bbox={comp.bbox_xyxy}\n")
+                    txt.insert(
+                        tk.END,
+                        f"  {cid} | {comp.class_id}:{comp.class_name} | bbox={comp.bbox_xyxy}\n",
+                    )
         txt.config(state="disabled")
 
     def refresh_node_info(self):
@@ -1351,7 +1608,10 @@ class IntegratedCircuitGUI:
         for k, v in self.node_params.items():
             txt.insert(tk.END, f"  {k}: {v}\n")
 
-        if self.selected_node_group_id is not None and self.selected_node_group_id in self.group_by_id:
+        if (
+            self.selected_node_group_id is not None
+            and self.selected_node_group_id in self.group_by_id
+        ):
             g = self.group_by_id[self.selected_node_group_id]
             txt.insert(tk.END, f"\nSelected node: node{g.id}\n")
             txt.insert(tk.END, f"  members_auto: {g.members_auto}\n")
@@ -1360,7 +1620,9 @@ class IntegratedCircuitGUI:
             txt.insert(tk.END, f"  attached components: {attached}\n")
 
         if self.connect_mode.get():
-            txt.insert(tk.END, f"\nConnect mode current node: {self.current_connect_node}\n")
+            txt.insert(
+                tk.END, f"\nConnect mode current node: {self.current_connect_node}\n"
+            )
         if self.merge_mode.get():
             txt.insert(tk.END, f"Merge mode first node: {self.pending_merge_first}\n")
         txt.config(state="disabled")
@@ -1379,7 +1641,9 @@ class IntegratedCircuitGUI:
             self.conns_list.insert(tk.END, f"node{conn.node_id} -> {conn.component_id}")
 
     def refresh_all(self):
-        self.stage_label.config(text=f"Stage: {'Component Review' if self.stage == 'component' else 'Node Annotation'}")
+        self.stage_label.config(
+            text=f"Stage: {'Component Review' if self.stage == 'component' else 'Node Annotation'}"
+        )
         self.refresh_component_info()
         self.refresh_node_info()
         self.refresh_node_lists()
@@ -1438,7 +1702,23 @@ class IntegratedCircuitGUI:
                 writer.writerow(row)
 
     def save_all_outputs(self):
-        components_json = self.out_dir / f"{self.image_path.stem}_reviewed_components.json"
+        unconnected_node_ids = self.get_unconnected_node_ids()
+        if unconnected_node_ids:
+            node_text = ", ".join([f"node{nid}" for nid in unconnected_node_ids[:12]])
+            if len(unconnected_node_ids) > 12:
+                node_text += ", ..."
+            proceed = messagebox.askyesno(
+                "Warning: Unconnected Nodes",
+                "There are node(s) on the canvas with no component connection:\n"
+                f"{node_text}\n\n"
+                "These nodes will still be saved unless you go back and remove or connect them. Continue saving?",
+            )
+            if not proceed:
+                self.set_status("Save cancelled: unconnected nodes still exist.")
+                return
+        components_json = (
+            self.out_dir / f"{self.image_path.stem}_reviewed_components.json"
+        )
         node_json = self.out_dir / f"{self.image_path.stem}_node_annotation.json"
         incidence_csv = self.out_dir / f"{self.image_path.stem}_incidence_matrix.csv"
         updated_yolo = self.out_dir / f"{self.image_path.stem}_reviewed.txt"
@@ -1464,11 +1744,19 @@ class IntegratedCircuitGUI:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Integrated component-review + node-annotation GUI")
+    ap = argparse.ArgumentParser(
+        description="Integrated component-review + node-annotation GUI"
+    )
     ap.add_argument("--image", required=True, help="Path to the input image")
     ap.add_argument("--labels", required=True, help="Path to the YOLO txt label file")
-    ap.add_argument("--out_dir", required=True, help="Directory to save reviewed outputs")
-    ap.add_argument("--class_map", default=None, help="Optional JSON file mapping class id to class name")
+    ap.add_argument(
+        "--out_dir", required=True, help="Directory to save reviewed outputs"
+    )
+    ap.add_argument(
+        "--class_map",
+        default=None,
+        help="Optional JSON file mapping class id to class name",
+    )
     ap.add_argument("--canvas_width", type=int, default=1100)
     ap.add_argument("--canvas_height", type=int, default=760)
     ap.add_argument("--mask_pad", type=int, default=2)

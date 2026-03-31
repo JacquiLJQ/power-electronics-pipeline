@@ -1,0 +1,382 @@
+{
+  "image_name": "100.png",
+  "image_path": "D:\\PowerElectronicsPipeline\\data\\preprocessed\\circuitnet\\100.png",
+  "params": {
+    "mask_pad": 2,
+    "blur": 3,
+    "open_iter": 1,
+    "close_iter": 2,
+    "min_area": 80,
+    "connectivity": 8,
+    "auto_conn_pad": 3,
+    "auto_conn_min_pixels": 2
+  },
+  "auto_nodes": [
+    {
+      "id": 1,
+      "area": 790,
+      "bbox_xywh": [
+        272,
+        40,
+        141,
+        92
+      ],
+      "centroid_xy": [
+        343.7151898734177,
+        80.39367088607595
+      ]
+    },
+    {
+      "id": 2,
+      "area": 819,
+      "bbox_xywh": [
+        446,
+        51,
+        103,
+        92
+      ],
+      "centroid_xy": [
+        492.1135531135531,
+        96.2905982905983
+      ]
+    },
+    {
+      "id": 3,
+      "area": 1489,
+      "bbox_xywh": [
+        48,
+        72,
+        126,
+        289
+      ],
+      "centroid_xy": [
+        126.67360644728005,
+        219.5594358629953
+      ]
+    },
+    {
+      "id": 4,
+      "area": 1830,
+      "bbox_xywh": [
+        586,
+        73,
+        211,
+        288
+      ],
+      "centroid_xy": [
+        670.8530054644809,
+        227.15628415300546
+      ]
+    },
+    {
+      "id": 5,
+      "area": 283,
+      "bbox_xywh": [
+        475,
+        155,
+        60,
+        36
+      ],
+      "centroid_xy": [
+        503.92932862190816,
+        162.54063604240284
+      ]
+    },
+    {
+      "id": 6,
+      "area": 201,
+      "bbox_xywh": [
+        232,
+        180,
+        67,
+        3
+      ],
+      "centroid_xy": [
+        265.0,
+        181.0
+      ]
+    },
+    {
+      "id": 7,
+      "area": 135,
+      "bbox_xywh": [
+        465,
+        197,
+        32,
+        15
+      ],
+      "centroid_xy": [
+        478.8814814814815,
+        200.92592592592592
+      ]
+    },
+    {
+      "id": 8,
+      "area": 108,
+      "bbox_xywh": [
+        350,
+        210,
+        3,
+        36
+      ],
+      "centroid_xy": [
+        351.0,
+        227.5
+      ]
+    },
+    {
+      "id": 9,
+      "area": 278,
+      "bbox_xywh": [
+        475,
+        244,
+        60,
+        35
+      ],
+      "centroid_xy": [
+        503.9712230215827,
+        270.9424460431655
+      ]
+    },
+    {
+      "id": 10,
+      "area": 219,
+      "bbox_xywh": [
+        501,
+        291,
+        5,
+        69
+      ],
+      "centroid_xy": [
+        503.0,
+        325.0
+      ]
+    },
+    {
+      "id": 11,
+      "area": 651,
+      "bbox_xywh": [
+        717,
+        301,
+        80,
+        104
+      ],
+      "centroid_xy": [
+        751.5545314900154,
+        356.46390168970817
+      ]
+    },
+    {
+      "id": 12,
+      "area": 320,
+      "bbox_xywh": [
+        25,
+        347,
+        48,
+        61
+      ],
+      "centroid_xy": [
+        48.775,
+        389.403125
+      ]
+    },
+    {
+      "id": 13,
+      "area": 108,
+      "bbox_xywh": [
+        448,
+        357,
+        33,
+        4
+      ],
+      "centroid_xy": [
+        464.8333333333333,
+        358.8333333333333
+      ]
+    },
+    {
+      "id": 14,
+      "area": 306,
+      "bbox_xywh": [
+        349,
+        358,
+        33,
+        70
+      ],
+      "centroid_xy": [
+        361.2450980392157,
+        395.8333333333333
+      ]
+    },
+    {
+      "id": 15,
+      "area": 93,
+      "bbox_xywh": [
+        33,
+        415,
+        31,
+        3
+      ],
+      "centroid_xy": [
+        48.0,
+        416.0
+      ]
+    },
+    {
+      "id": 16,
+      "area": 260,
+      "bbox_xywh": [
+        327,
+        495,
+        47,
+        42
+      ],
+      "centroid_xy": [
+        350.4576923076923,
+        525.5346153846153
+      ]
+    }
+  ],
+  "manual_nodes": [
+    {
+      "id": 17,
+      "x": 502,
+      "y": 354,
+      "radius": 6,
+      "kind": "manual_circle"
+    }
+  ],
+  "node_groups": [
+    {
+      "id": 1,
+      "members_auto": [
+        1
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 2,
+      "members_auto": [
+        2
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 3,
+      "members_auto": [
+        3
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 4,
+      "members_auto": [
+        4
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 11,
+      "members_auto": [
+        11
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 14,
+      "members_auto": [
+        14
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 17,
+      "members_auto": [],
+      "members_manual": [
+        17
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "node_id": 4,
+      "component_id": "comp_0000"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0001"
+    },
+    {
+      "node_id": 2,
+      "component_id": "comp_0001"
+    },
+    {
+      "node_id": 2,
+      "component_id": "comp_0002"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0002"
+    },
+    {
+      "node_id": 14,
+      "component_id": "comp_0004"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0005"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0006"
+    },
+    {
+      "node_id": 11,
+      "component_id": "comp_0006"
+    },
+    {
+      "node_id": 11,
+      "component_id": "comp_0008"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0010"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0011"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0011"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0012"
+    },
+    {
+      "node_id": 14,
+      "component_id": "comp_0013"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0014"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0015"
+    },
+    {
+      "node_id": 11,
+      "component_id": "comp_0015"
+    },
+    {
+      "node_id": 17,
+      "component_id": "comp_0003"
+    },
+    {
+      "node_id": 17,
+      "component_id": "comp_0000"
+    }
+  ]
+}
