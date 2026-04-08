@@ -176,6 +176,25 @@
       "source": "yolo"
     },
     {
+      "component_id": "comp_0009",
+      "class_id": 1,
+      "class_name": "battery",
+      "confidence": 0.834863,
+      "bbox_xyxy": [
+        21,
+        408,
+        69,
+        427
+      ],
+      "bbox_xywh_abs": [
+        45.0,
+        417.5,
+        48,
+        19
+      ],
+      "source": "yolo"
+    },
+    {
       "component_id": "comp_0010",
       "class_id": 5,
       "class_name": "inductor",

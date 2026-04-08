@@ -1,0 +1,100 @@
+{
+  "image_name": "100.png",
+  "image_path": "D:\\PowerElectronicsPipeline\\data\\preprocessed\\circuitnet\\100.png",
+  "components_json": "D:\\PowerElectronicsPipeline\\testoutput\\100_reviewed_components.json",
+  "node_json": "D:\\PowerElectronicsPipeline\\testoutput\\100_node_annotation.json",
+  "pin_schema": {
+    "cap": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "inductor": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "resistor": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "swi_ideal": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "diode": [
+      "anode",
+      "cathode"
+    ],
+    "battery": [
+      "positive",
+      "negative"
+    ],
+    "ac_src": [
+      "positive",
+      "negative"
+    ],
+    "volt_src": [
+      "positive",
+      "negative"
+    ],
+    "curr_src": [
+      "positive",
+      "negative"
+    ]
+  },
+  "pin_connections": [
+    {
+      "node_id": 4,
+      "component_id": "comp_0006",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 11,
+      "component_id": "comp_0006",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0011",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0011",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0015",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 11,
+      "component_id": "comp_0015",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0012",
+      "pin_name": "positive",
+      "source": "manual"
+    },
+    {
+      "node_id": 12,
+      "component_id": "comp_0012",
+      "pin_name": "negative",
+      "source": "manual"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0010",
+      "pin_name": "terminal_1",
+      "source": "manual"
+    }
+  ]
+}

@@ -168,16 +168,16 @@
     },
     {
       "id": 12,
-      "area": 320,
+      "area": 177,
       "bbox_xywh": [
-        25,
-        347,
         48,
-        61
+        347,
+        3,
+        59
       ],
       "centroid_xy": [
-        48.775,
-        389.403125
+        49.0,
+        376.0
       ]
     },
     {
@@ -210,20 +210,6 @@
     },
     {
       "id": 15,
-      "area": 93,
-      "bbox_xywh": [
-        33,
-        415,
-        31,
-        3
-      ],
-      "centroid_xy": [
-        48.0,
-        416.0
-      ]
-    },
-    {
-      "id": 16,
       "area": 260,
       "bbox_xywh": [
         327,
@@ -237,15 +223,7 @@
       ]
     }
   ],
-  "manual_nodes": [
-    {
-      "id": 17,
-      "x": 502,
-      "y": 354,
-      "radius": 6,
-      "kind": "manual_circle"
-    }
-  ],
+  "manual_nodes": [],
   "node_groups": [
     {
       "id": 1,
@@ -283,18 +261,18 @@
       "members_manual": []
     },
     {
+      "id": 12,
+      "members_auto": [
+        12
+      ],
+      "members_manual": []
+    },
+    {
       "id": 14,
       "members_auto": [
         14
       ],
       "members_manual": []
-    },
-    {
-      "id": 17,
-      "members_auto": [],
-      "members_manual": [
-        17
-      ]
     }
   ],
   "connections": [
@@ -339,6 +317,10 @@
       "component_id": "comp_0008"
     },
     {
+      "node_id": 12,
+      "component_id": "comp_0009"
+    },
+    {
       "node_id": 3,
       "component_id": "comp_0010"
     },
@@ -352,6 +334,10 @@
     },
     {
       "node_id": 3,
+      "component_id": "comp_0012"
+    },
+    {
+      "node_id": 12,
       "component_id": "comp_0012"
     },
     {
@@ -369,14 +355,6 @@
     {
       "node_id": 11,
       "component_id": "comp_0015"
-    },
-    {
-      "node_id": 17,
-      "component_id": "comp_0003"
-    },
-    {
-      "node_id": 17,
-      "component_id": "comp_0000"
     }
   ]
 }

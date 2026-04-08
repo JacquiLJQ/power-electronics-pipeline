@@ -1,0 +1,10 @@
+component_id,class_name,pin_name,node_id,source
+comp_0006,resistor,terminal_1,4,auto
+comp_0006,resistor,terminal_2,11,auto
+comp_0011,inductor,terminal_2,1,auto
+comp_0011,inductor,terminal_1,3,auto
+comp_0015,cap,terminal_1,4,auto
+comp_0015,cap,terminal_2,11,auto
+comp_0012,ac_src,positive,3,manual
+comp_0012,ac_src,negative,12,manual
+comp_0010,inductor,terminal_1,3,manual

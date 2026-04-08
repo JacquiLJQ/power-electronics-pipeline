@@ -13,17 +13,17 @@ from tkinter import messagebox, ttk
 
 
 DEFAULT_CLASS_MAP = {
-    0: "ac_src",
-    1: "battery",
-    2: "cap",
-    3: "curr_src",
-    4: "diode",
-    5: "inductor",
-    6: "resistor",
-    7: "swi_ideal",
-    8: "swi_real",
-    9: "volt_src",
-    10: "xformer",
+    0: "ac_src",  # positive / negative
+    1: "battery",  # positive / negative
+    2: "cap",  # terminal 1 / terminal 2
+    3: "curr_src",  # positive / negative
+    4: "diode",  # anode / cathode
+    5: "inductor",  # terminal 1 / terminal 2
+    6: "resistor",  # terminal 1 / terminal 2
+    7: "swi_ideal",  # terminal 1 / terminal 2
+    8: "swi_real",  # MOSFET non-two terminal
+    9: "volt_src",  # positive / negative
+    10: "xformer",  # non-two terminal
 }
 
 
