@@ -1,0 +1,118 @@
+{
+  "image_name": "1.png",
+  "image_path": "D:\\PowerElectronicsPipeline\\data\\preprocessed\\circuitnet\\1.png",
+  "components_json": "D:\\PowerElectronicsPipeline\\testoutput\\1_reviewed_components.json",
+  "node_json": "D:\\PowerElectronicsPipeline\\testoutput\\1_node_annotation.json",
+  "pin_schema": {
+    "cap": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "inductor": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "resistor": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "swi_ideal": [
+      "terminal_1",
+      "terminal_2"
+    ],
+    "diode": [
+      "anode",
+      "cathode"
+    ],
+    "battery": [
+      "positive",
+      "negative"
+    ],
+    "ac_src": [
+      "positive",
+      "negative"
+    ],
+    "volt_src": [
+      "positive",
+      "negative"
+    ],
+    "curr_src": [
+      "positive",
+      "negative"
+    ]
+  },
+  "pin_connections": [
+    {
+      "node_id": 2,
+      "component_id": "comp_0002",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0002",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0003",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 5,
+      "component_id": "comp_0003",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0005",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 2,
+      "component_id": "comp_0005",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 3,
+      "component_id": "comp_0006",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0006",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 4,
+      "component_id": "comp_0007",
+      "pin_name": "terminal_1",
+      "source": "auto"
+    },
+    {
+      "node_id": 5,
+      "component_id": "comp_0007",
+      "pin_name": "terminal_2",
+      "source": "auto"
+    },
+    {
+      "node_id": 1,
+      "component_id": "comp_0001",
+      "pin_name": "positive",
+      "source": "manual"
+    },
+    {
+      "node_id": 5,
+      "component_id": "comp_0001",
+      "pin_name": "negative",
+      "source": "manual"
+    }
+  ]
+}
