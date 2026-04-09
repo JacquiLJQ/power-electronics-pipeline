@@ -655,7 +655,6 @@ class IntegratedCircuitGUI:
                 self.current_connect_node = None
 
         if removed:
-            # 顺便把指向已删除 node 的 connection 清掉，更稳一点
             removed_set = set(removed)
             self.connections = [
                 c for c in self.connections if c.node_id not in removed_set
