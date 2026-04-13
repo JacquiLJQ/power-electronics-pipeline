@@ -1,0 +1,597 @@
+{
+  "image": "6_png.jpg",
+  "source_component_json": "6_png.json",
+  "params": {
+    "mask_pad": 2,
+    "blur": 3,
+    "open_iter": 1,
+    "close_iter": 2,
+    "min_area": 80,
+    "connectivity": 8
+  },
+  "components": [
+    {
+      "id": 1,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_1",
+      "bbox_xywh": [
+        13,
+        43,
+        35,
+        46
+      ]
+    },
+    {
+      "id": 2,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_2",
+      "bbox_xywh": [
+        149,
+        42,
+        40,
+        45
+      ]
+    },
+    {
+      "id": 3,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_3",
+      "bbox_xywh": [
+        224,
+        46,
+        35,
+        38
+      ]
+    },
+    {
+      "id": 4,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_4",
+      "bbox_xywh": [
+        293,
+        45,
+        40,
+        39
+      ]
+    },
+    {
+      "id": 5,
+      "category_id": 18,
+      "category_name": "wire_jump",
+      "instance_name": "wire_jump_1",
+      "bbox_xywh": [
+        247,
+        86,
+        11,
+        6
+      ]
+    },
+    {
+      "id": 6,
+      "category_id": 18,
+      "category_name": "wire_jump",
+      "instance_name": "wire_jump_2",
+      "bbox_xywh": [
+        316,
+        84,
+        13,
+        9
+      ]
+    },
+    {
+      "id": 7,
+      "category_id": 18,
+      "category_name": "wire_jump",
+      "instance_name": "wire_jump_3",
+      "bbox_xywh": [
+        316,
+        101,
+        15,
+        9
+      ]
+    },
+    {
+      "id": 8,
+      "category_id": 3,
+      "category_name": "cap",
+      "instance_name": "cap_1",
+      "bbox_xywh": [
+        404,
+        68,
+        25,
+        17
+      ]
+    },
+    {
+      "id": 9,
+      "category_id": 3,
+      "category_name": "cap",
+      "instance_name": "cap_2",
+      "bbox_xywh": [
+        445,
+        67,
+        26,
+        17
+      ]
+    },
+    {
+      "id": 10,
+      "category_id": 3,
+      "category_name": "cap",
+      "instance_name": "cap_3",
+      "bbox_xywh": [
+        404,
+        128,
+        24,
+        19
+      ]
+    },
+    {
+      "id": 11,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_1",
+      "bbox_xywh": [
+        313,
+        133,
+        20,
+        19
+      ]
+    },
+    {
+      "id": 12,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_2",
+      "bbox_xywh": [
+        243,
+        133,
+        20,
+        18
+      ]
+    },
+    {
+      "id": 13,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_3",
+      "bbox_xywh": [
+        174,
+        134,
+        19,
+        18
+      ]
+    },
+    {
+      "id": 14,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_5",
+      "bbox_xywh": [
+        154,
+        161,
+        34,
+        37
+      ]
+    },
+    {
+      "id": 15,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_6",
+      "bbox_xywh": [
+        224,
+        161,
+        35,
+        37
+      ]
+    },
+    {
+      "id": 16,
+      "category_id": 13,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_7",
+      "bbox_xywh": [
+        292,
+        158,
+        36,
+        40
+      ]
+    },
+    {
+      "id": 17,
+      "category_id": 7,
+      "category_name": "inductor",
+      "instance_name": "inductor_1",
+      "bbox_xywh": [
+        102,
+        79,
+        18,
+        47
+      ]
+    },
+    {
+      "id": 18,
+      "category_id": 17,
+      "category_name": "volt_src",
+      "instance_name": "volt_src_1",
+      "bbox_xywh": [
+        28,
+        116,
+        26,
+        33
+      ]
+    },
+    {
+      "id": 19,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_4",
+      "bbox_xywh": [
+        32,
+        17,
+        20,
+        20
+      ]
+    },
+    {
+      "id": 20,
+      "category_id": 18,
+      "category_name": "wire_jump",
+      "instance_name": "wire_jump_4",
+      "bbox_xywh": [
+        454,
+        99,
+        9,
+        16
+      ]
+    },
+    {
+      "id": 21,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_5",
+      "bbox_xywh": [
+        245,
+        17,
+        18,
+        18
+      ]
+    },
+    {
+      "id": 22,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_6",
+      "bbox_xywh": [
+        313,
+        17,
+        21,
+        18
+      ]
+    },
+    {
+      "id": 23,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_7",
+      "bbox_xywh": [
+        174,
+        18,
+        20,
+        18
+      ]
+    }
+  ],
+  "node_groups": [
+    {
+      "id": 1,
+      "members_auto": [
+        1
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 2,
+      "members_auto": [
+        2,
+        4
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 3,
+      "members_auto": [
+        3,
+        5
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 6,
+      "members_auto": [
+        6
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 7,
+      "members_auto": [
+        7
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 8,
+      "members_auto": [],
+      "members_manual": [
+        8
+      ]
+    },
+    {
+      "id": 9,
+      "members_auto": [],
+      "members_manual": [
+        9
+      ]
+    },
+    {
+      "id": 10,
+      "members_auto": [],
+      "members_manual": [
+        10
+      ]
+    },
+    {
+      "id": 11,
+      "members_auto": [],
+      "members_manual": [
+        11
+      ]
+    },
+    {
+      "id": 12,
+      "members_auto": [],
+      "members_manual": [
+        12
+      ]
+    },
+    {
+      "id": 13,
+      "members_auto": [],
+      "members_manual": [
+        13
+      ]
+    },
+    {
+      "id": 14,
+      "members_auto": [],
+      "members_manual": [
+        14
+      ]
+    },
+    {
+      "id": 15,
+      "members_auto": [],
+      "members_manual": [
+        15
+      ]
+    }
+  ],
+  "manual_nodes": [
+    {
+      "id": 8,
+      "x": 183,
+      "y": 42,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 9,
+      "x": 253,
+      "y": 41,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 10,
+      "x": 323,
+      "y": 45,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 11,
+      "x": 184,
+      "y": 153,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 12,
+      "x": 251,
+      "y": 152,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 13,
+      "x": 322,
+      "y": 155,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 14,
+      "x": 41,
+      "y": 43,
+      "radius": 6,
+      "kind": "manual_circle"
+    },
+    {
+      "id": 15,
+      "x": 40,
+      "y": 93,
+      "radius": 6,
+      "kind": "manual_circle"
+    }
+  ],
+  "connections": [
+    {
+      "node_id": 1,
+      "component_id": 17
+    },
+    {
+      "node_id": 1,
+      "component_id": 23
+    },
+    {
+      "node_id": 1,
+      "component_id": 21
+    },
+    {
+      "node_id": 1,
+      "component_id": 22
+    },
+    {
+      "node_id": 1,
+      "component_id": 19
+    },
+    {
+      "node_id": 2,
+      "component_id": 2
+    },
+    {
+      "node_id": 2,
+      "component_id": 13
+    },
+    {
+      "node_id": 2,
+      "component_id": 8
+    },
+    {
+      "node_id": 2,
+      "component_id": 9
+    },
+    {
+      "node_id": 3,
+      "component_id": 3
+    },
+    {
+      "node_id": 3,
+      "component_id": 12
+    },
+    {
+      "node_id": 3,
+      "component_id": 8
+    },
+    {
+      "node_id": 3,
+      "component_id": 10
+    },
+    {
+      "node_id": 6,
+      "component_id": 4
+    },
+    {
+      "node_id": 6,
+      "component_id": 11
+    },
+    {
+      "node_id": 6,
+      "component_id": 10
+    },
+    {
+      "node_id": 6,
+      "component_id": 9
+    },
+    {
+      "node_id": 7,
+      "component_id": 18
+    },
+    {
+      "node_id": 7,
+      "component_id": 17
+    },
+    {
+      "node_id": 7,
+      "component_id": 14
+    },
+    {
+      "node_id": 7,
+      "component_id": 15
+    },
+    {
+      "node_id": 7,
+      "component_id": 16
+    },
+    {
+      "node_id": 8,
+      "component_id": 23
+    },
+    {
+      "node_id": 8,
+      "component_id": 2
+    },
+    {
+      "node_id": 9,
+      "component_id": 21
+    },
+    {
+      "node_id": 9,
+      "component_id": 3
+    },
+    {
+      "node_id": 10,
+      "component_id": 4
+    },
+    {
+      "node_id": 10,
+      "component_id": 22
+    },
+    {
+      "node_id": 11,
+      "component_id": 13
+    },
+    {
+      "node_id": 11,
+      "component_id": 14
+    },
+    {
+      "node_id": 12,
+      "component_id": 12
+    },
+    {
+      "node_id": 12,
+      "component_id": 15
+    },
+    {
+      "node_id": 13,
+      "component_id": 11
+    },
+    {
+      "node_id": 13,
+      "component_id": 16
+    },
+    {
+      "node_id": 14,
+      "component_id": 19
+    },
+    {
+      "node_id": 14,
+      "component_id": 1
+    },
+    {
+      "node_id": 15,
+      "component_id": 1
+    },
+    {
+      "node_id": 15,
+      "component_id": 18
+    }
+  ]
+}

@@ -1,0 +1,417 @@
+{
+  "image_name": "220.png",
+  "image_path": "data\\preprocessed\\circuitnet\\220.png",
+  "image_width": 921,
+  "image_height": 506,
+  "flags": {
+    "has_same_class_merge": true,
+    "has_disconnected_removal": true,
+    "has_cross_class_resolve": false
+  },
+  "summary": {
+    "raw_component_count": 20,
+    "final_component_count": 18,
+    "merged_same_class_count": 1,
+    "removed_cross_class_count": 0,
+    "removed_disconnected_count": 1
+  },
+  "components": [
+    {
+      "component_id": "comp_0",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.92396,
+      "bbox_xyxy": [
+        243,
+        113,
+        276,
+        178
+      ],
+      "bbox_xywh_abs": [
+        259.5,
+        145.5,
+        33,
+        65
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_0"
+      ]
+    },
+    {
+      "component_id": "comp_1",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.907642,
+      "bbox_xyxy": [
+        245,
+        391,
+        276,
+        453
+      ],
+      "bbox_xywh_abs": [
+        260.5,
+        422.0,
+        31,
+        62
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_3"
+      ]
+    },
+    {
+      "component_id": "comp_2",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.901667,
+      "bbox_xyxy": [
+        388,
+        379,
+        425,
+        488
+      ],
+      "bbox_xywh_abs": [
+        406.5,
+        433.5,
+        37,
+        109
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_4"
+      ]
+    },
+    {
+      "component_id": "comp_3",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.893683,
+      "bbox_xyxy": [
+        387,
+        111,
+        426,
+        182
+      ],
+      "bbox_xywh_abs": [
+        406.5,
+        146.5,
+        39,
+        71
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_5"
+      ]
+    },
+    {
+      "component_id": "comp_4",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.567284,
+      "bbox_xyxy": [
+        83,
+        478,
+        151,
+        495
+      ],
+      "bbox_xywh_abs": [
+        117.0,
+        486.5,
+        68,
+        17
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_12"
+      ]
+    },
+    {
+      "component_id": "comp_5",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.463098,
+      "bbox_xyxy": [
+        378,
+        313,
+        445,
+        354
+      ],
+      "bbox_xywh_abs": [
+        411.5,
+        333.5,
+        67,
+        41
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_14"
+      ]
+    },
+    {
+      "component_id": "comp_6",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.399363,
+      "bbox_xyxy": [
+        687,
+        182,
+        699,
+        274
+      ],
+      "bbox_xywh_abs": [
+        693.0,
+        228.0,
+        12,
+        92
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_15"
+      ]
+    },
+    {
+      "component_id": "comp_7",
+      "class_id": 7,
+      "class_name": null,
+      "confidence": 0.395446,
+      "bbox_xyxy": [
+        254,
+        484,
+        294,
+        494
+      ],
+      "bbox_xywh_abs": [
+        274.0,
+        489.0,
+        40,
+        10
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_16"
+      ]
+    },
+    {
+      "component_id": "comp_9",
+      "class_id": 4,
+      "class_name": null,
+      "confidence": 0.912269,
+      "bbox_xyxy": [
+        614,
+        105,
+        641,
+        134
+      ],
+      "bbox_xywh_abs": [
+        627.5,
+        119.5,
+        27,
+        29
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_1"
+      ]
+    },
+    {
+      "component_id": "comp_10",
+      "class_id": 4,
+      "class_name": null,
+      "confidence": 0.877225,
+      "bbox_xyxy": [
+        603,
+        436,
+        642,
+        498
+      ],
+      "bbox_xywh_abs": [
+        622.5,
+        467.0,
+        39,
+        62
+      ],
+      "source": "merged_same_class",
+      "merged_from": [
+        "raw_6",
+        "raw_13"
+      ]
+    },
+    {
+      "component_id": "comp_11",
+      "class_id": 4,
+      "class_name": null,
+      "confidence": 0.251085,
+      "bbox_xyxy": [
+        571,
+        135,
+        584,
+        152
+      ],
+      "bbox_xywh_abs": [
+        577.5,
+        143.5,
+        13,
+        17
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_19"
+      ]
+    },
+    {
+      "component_id": "comp_12",
+      "class_id": 1,
+      "class_name": null,
+      "confidence": 0.907704,
+      "bbox_xyxy": [
+        43,
+        253,
+        116,
+        321
+      ],
+      "bbox_xywh_abs": [
+        79.5,
+        287.0,
+        73,
+        68
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_2"
+      ]
+    },
+    {
+      "component_id": "comp_13",
+      "class_id": 2,
+      "class_name": null,
+      "confidence": 0.868742,
+      "bbox_xyxy": [
+        741,
+        160,
+        788,
+        243
+      ],
+      "bbox_xywh_abs": [
+        764.5,
+        201.5,
+        47,
+        83
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_7"
+      ]
+    },
+    {
+      "component_id": "comp_14",
+      "class_id": 6,
+      "class_name": null,
+      "confidence": 0.856712,
+      "bbox_xyxy": [
+        847,
+        166,
+        868,
+        229
+      ],
+      "bbox_xywh_abs": [
+        857.5,
+        197.5,
+        21,
+        63
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_8"
+      ]
+    },
+    {
+      "component_id": "comp_15",
+      "class_id": 6,
+      "class_name": null,
+      "confidence": 0.652502,
+      "bbox_xyxy": [
+        266,
+        210,
+        280,
+        264
+      ],
+      "bbox_xywh_abs": [
+        273.0,
+        237.0,
+        14,
+        54
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_11"
+      ]
+    },
+    {
+      "component_id": "comp_16",
+      "class_id": 6,
+      "class_name": null,
+      "confidence": 0.305777,
+      "bbox_xyxy": [
+        80,
+        364,
+        84,
+        417
+      ],
+      "bbox_xywh_abs": [
+        82.0,
+        390.5,
+        4,
+        53
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_17"
+      ]
+    },
+    {
+      "component_id": "comp_17",
+      "class_id": 5,
+      "class_name": null,
+      "confidence": 0.841745,
+      "bbox_xyxy": [
+        113,
+        40,
+        227,
+        117
+      ],
+      "bbox_xywh_abs": [
+        170.0,
+        78.5,
+        114,
+        77
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_9"
+      ]
+    },
+    {
+      "component_id": "comp_18",
+      "class_id": 10,
+      "class_name": null,
+      "confidence": 0.818849,
+      "bbox_xyxy": [
+        497,
+        115,
+        561,
+        452
+      ],
+      "bbox_xywh_abs": [
+        529.0,
+        283.5,
+        64,
+        337
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_10"
+      ]
+    }
+  ]
+}

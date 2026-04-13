@@ -1,0 +1,213 @@
+{
+  "info": {
+    "year": "2026",
+    "version": "3",
+    "description": "Exported from roboflow.com",
+    "contributor": "",
+    "url": "https://public.roboflow.com/object-detection/undefined",
+    "date_created": "2026-02-05T04:06:49+00:00"
+  },
+  "licenses": [
+    {
+      "id": 1,
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "name": "CC BY 4.0"
+    }
+  ],
+  "categories": [
+    {
+      "id": 0,
+      "name": "objects",
+      "supercategory": "none"
+    },
+    {
+      "id": 1,
+      "name": "ac_src",
+      "supercategory": "objects"
+    },
+    {
+      "id": 2,
+      "name": "battery",
+      "supercategory": "objects"
+    },
+    {
+      "id": 3,
+      "name": "cap",
+      "supercategory": "objects"
+    },
+    {
+      "id": 4,
+      "name": "curr_src",
+      "supercategory": "objects"
+    },
+    {
+      "id": 5,
+      "name": "diode",
+      "supercategory": "objects"
+    },
+    {
+      "id": 6,
+      "name": "ground",
+      "supercategory": "objects"
+    },
+    {
+      "id": 7,
+      "name": "inductor",
+      "supercategory": "objects"
+    },
+    {
+      "id": 8,
+      "name": "load",
+      "supercategory": "objects"
+    },
+    {
+      "id": 9,
+      "name": "negative_sign",
+      "supercategory": "objects"
+    },
+    {
+      "id": 10,
+      "name": "positive_sign",
+      "supercategory": "objects"
+    },
+    {
+      "id": 11,
+      "name": "resistor",
+      "supercategory": "objects"
+    },
+    {
+      "id": 12,
+      "name": "swi_ideal",
+      "supercategory": "objects"
+    },
+    {
+      "id": 13,
+      "name": "swi_real",
+      "supercategory": "objects"
+    },
+    {
+      "id": 14,
+      "name": "text",
+      "supercategory": "objects"
+    },
+    {
+      "id": 15,
+      "name": "transformer",
+      "supercategory": "objects"
+    },
+    {
+      "id": 16,
+      "name": "unknown_component",
+      "supercategory": "objects"
+    },
+    {
+      "id": 17,
+      "name": "volt_src",
+      "supercategory": "objects"
+    },
+    {
+      "id": 18,
+      "name": "wire_jump",
+      "supercategory": "objects"
+    }
+  ],
+  "images": [
+    {
+      "id": 158,
+      "license": 1,
+      "file_name": "307_png.rf.3ce1251a1a6a49beb861ecbfda90815d.jpg",
+      "height": 612,
+      "width": 928,
+      "date_captured": "2026-02-05T04:06:49+00:00",
+      "extra": {
+        "name": "307.png"
+      }
+    }
+  ],
+  "annotations": [
+    {
+      "id": 2118,
+      "image_id": 158,
+      "category_id": 12,
+      "bbox": [
+        283,
+        210,
+        98.15,
+        213.13
+      ],
+      "area": 20918.709,
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2119,
+      "image_id": 158,
+      "category_id": 17,
+      "bbox": [
+        2,
+        239,
+        149.38,
+        173.24
+      ],
+      "area": 25878.591,
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2120,
+      "image_id": 158,
+      "category_id": 7,
+      "bbox": [
+        109,
+        6,
+        210.46,
+        92.8
+      ],
+      "area": 19530.688,
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2121,
+      "image_id": 158,
+      "category_id": 5,
+      "bbox": [
+        467,
+        6,
+        104.75,
+        90.37
+      ],
+      "area": 9466.257,
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2122,
+      "image_id": 158,
+      "category_id": 3,
+      "bbox": [
+        531,
+        291,
+        162.24,
+        56.43
+      ],
+      "area": 9155.203,
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2123,
+      "image_id": 158,
+      "category_id": 11,
+      "bbox": [
+        843,
+        222,
+        83.45,
+        205.76
+      ],
+      "area": 17170.672,
+      "segmentation": [],
+      "iscrowd": 0
+    }
+  ]
+}

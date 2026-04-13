@@ -1,0 +1,130 @@
+{
+  "image_name": "21.png",
+  "image_path": "data\\preprocessed\\circuitnet\\21.png",
+  "image_width": 379,
+  "image_height": 284,
+  "flags": {
+    "has_same_class_merge": false,
+    "has_disconnected_removal": false,
+    "has_cross_class_resolve": true
+  },
+  "summary": {
+    "raw_component_count": 6,
+    "final_component_count": 5,
+    "merged_same_class_count": 0,
+    "removed_cross_class_count": 1,
+    "removed_disconnected_count": 0
+  },
+  "components": [
+    {
+      "component_id": "comp_0",
+      "class_id": 8,
+      "class_name": null,
+      "confidence": 0.970168,
+      "bbox_xyxy": [
+        245,
+        57,
+        298,
+        118
+      ],
+      "bbox_xywh_abs": [
+        271.5,
+        87.5,
+        53,
+        61
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_0"
+      ]
+    },
+    {
+      "component_id": "comp_1",
+      "class_id": 8,
+      "class_name": null,
+      "confidence": 0.920846,
+      "bbox_xyxy": [
+        245,
+        195,
+        298,
+        256
+      ],
+      "bbox_xywh_abs": [
+        271.5,
+        225.5,
+        53,
+        61
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_1"
+      ]
+    },
+    {
+      "component_id": "comp_3",
+      "class_id": 8,
+      "class_name": null,
+      "confidence": 0.438021,
+      "bbox_xyxy": [
+        95,
+        57,
+        149,
+        123
+      ],
+      "bbox_xywh_abs": [
+        122.0,
+        90.0,
+        54,
+        66
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_5"
+      ]
+    },
+    {
+      "component_id": "comp_4",
+      "class_id": 4,
+      "class_name": null,
+      "confidence": 0.863609,
+      "bbox_xyxy": [
+        95,
+        195,
+        149,
+        258
+      ],
+      "bbox_xywh_abs": [
+        122.0,
+        226.5,
+        54,
+        63
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_2"
+      ]
+    },
+    {
+      "component_id": "comp_5",
+      "class_id": 5,
+      "class_name": null,
+      "confidence": 0.71393,
+      "bbox_xyxy": [
+        63,
+        147,
+        89,
+        161
+      ],
+      "bbox_xywh_abs": [
+        76.0,
+        154.0,
+        26,
+        14
+      ],
+      "source": "raw_yolo",
+      "merged_from": [
+        "raw_3"
+      ]
+    }
+  ]
+}

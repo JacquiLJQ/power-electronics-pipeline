@@ -1,0 +1,226 @@
+{
+  "image": "1_png.jpg",
+  "source_component_json": "1_png.json",
+  "params": {
+    "mask_pad": 2,
+    "blur": 3,
+    "open_iter": 1,
+    "close_iter": 2,
+    "min_area": 80,
+    "connectivity": 8
+  },
+  "components": [
+    {
+      "id": 1,
+      "category_id": 3,
+      "category_name": "cap",
+      "instance_name": "cap_1",
+      "bbox_xywh": [
+        182,
+        24,
+        17,
+        26
+      ]
+    },
+    {
+      "id": 2,
+      "category_id": 3,
+      "category_name": "cap",
+      "instance_name": "cap_2",
+      "bbox_xywh": [
+        320,
+        74,
+        27,
+        17
+      ]
+    },
+    {
+      "id": 3,
+      "category_id": 7,
+      "category_name": "inductor",
+      "instance_name": "inductor_1",
+      "bbox_xywh": [
+        76,
+        27,
+        43,
+        16
+      ]
+    },
+    {
+      "id": 4,
+      "category_id": 7,
+      "category_name": "inductor",
+      "instance_name": "inductor_2",
+      "bbox_xywh": [
+        258,
+        28,
+        51,
+        13
+      ]
+    },
+    {
+      "id": 5,
+      "category_id": 14,
+      "category_name": "swi_real",
+      "instance_name": "swi_real_1",
+      "bbox_xywh": [
+        109,
+        60,
+        44,
+        45
+      ]
+    },
+    {
+      "id": 6,
+      "category_id": 18,
+      "category_name": "volt_src",
+      "instance_name": "volt_src_1",
+      "bbox_xywh": [
+        28,
+        70,
+        28,
+        27
+      ]
+    },
+    {
+      "id": 7,
+      "category_id": 5,
+      "category_name": "diode",
+      "instance_name": "diode_1",
+      "bbox_xywh": [
+        224,
+        72,
+        18,
+        19
+      ]
+    },
+    {
+      "id": 8,
+      "category_id": 12,
+      "category_name": "resistor",
+      "instance_name": "resistor_1",
+      "bbox_xywh": [
+        378,
+        73,
+        11,
+        21
+      ]
+    },
+    {
+      "id": 9,
+      "category_id": 15,
+      "category_name": "text",
+      "instance_name": "text_1",
+      "bbox_xywh": [
+        364,
+        76,
+        8,
+        11
+      ]
+    }
+  ],
+  "node_groups": [
+    {
+      "id": 1,
+      "members_auto": [
+        1
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 2,
+      "members_auto": [
+        2
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 3,
+      "members_auto": [
+        3
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 4,
+      "members_auto": [
+        4
+      ],
+      "members_manual": []
+    },
+    {
+      "id": 5,
+      "members_auto": [
+        5
+      ],
+      "members_manual": []
+    }
+  ],
+  "manual_nodes": [],
+  "connections": [
+    {
+      "node_id": 5,
+      "component_id": 8
+    },
+    {
+      "node_id": 5,
+      "component_id": 7
+    },
+    {
+      "node_id": 5,
+      "component_id": 2
+    },
+    {
+      "node_id": 5,
+      "component_id": 5
+    },
+    {
+      "node_id": 5,
+      "component_id": 6
+    },
+    {
+      "node_id": 4,
+      "component_id": 4
+    },
+    {
+      "node_id": 4,
+      "component_id": 2
+    },
+    {
+      "node_id": 4,
+      "component_id": 8
+    },
+    {
+      "node_id": 3,
+      "component_id": 1
+    },
+    {
+      "node_id": 3,
+      "component_id": 7
+    },
+    {
+      "node_id": 3,
+      "component_id": 4
+    },
+    {
+      "node_id": 2,
+      "component_id": 3
+    },
+    {
+      "node_id": 2,
+      "component_id": 5
+    },
+    {
+      "node_id": 2,
+      "component_id": 1
+    },
+    {
+      "node_id": 1,
+      "component_id": 3
+    },
+    {
+      "node_id": 1,
+      "component_id": 6
+    }
+  ]
+}
